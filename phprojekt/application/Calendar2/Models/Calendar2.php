@@ -406,46 +406,69 @@ class Calendar2_Models_Calendar2 extends Phprojekt_Item_Abstract
      * Note that even if $user is given and different from the current user,
      * only public events will be returned.
      *
-     * @param Datetime $start The start of the period.
-     * @param Datetime $end   The end of the period.
-     * @param int      $user  The id of the user to query for. If omitted or
-     *                        null, the currently logged in user is used.
+     * @param Datetime  $start The start of the period.
+     * @param Datetime  $end   The end of the period.
+     * @param int|array $users The id of the user(s) to query for. If omitted
+     *                         or null, the currently logged in user is used.
      *
      * @return array of Calendar2_Models_Calendar
      */
     public function fetchAllForPeriod(Datetime $start, Datetime $end,
-                                      $user = null)
+                                      $users = null)
     {
-        if (is_null($user)) {
+        // Normalize the $users argument to be an array of ids
+        if (is_null($users)) {
             // Default to the current user.
-            $user = Phprojekt_Auth::getUserId();
+            $users = array(Phprojekt_Auth::getUserId());
+        } else if (!is_array($users)) {
+            $users = array($users);
         }
 
-        $db     = $this->getAdapter();
-        $where  = $db->quoteInto(
-            'calendar2_user_relation.user_id = ? ',
-            (int) $user
-        );
-
-        if (Phprojekt_Auth::getUserId() != $user) {
-            $where .= $db->quoteInto(
-                'AND calendar2.visibility != ?',
-                (int) self::VISIBILITY_PRIVATE
+        // Query the database for the events.
+        $db    = $this->getAdapter();
+        $where = $db->quoteInto('start <= ?', $end->format('Y-m-d H:i:s'));
+        foreach ($users as $user) {
+            $w = $db->quoteInto(
+                'calendar2_user_relation.user_id = ? ',
+                (int) $users
             );
+
+            if (Phprojekt_Auth::getUserId() != $users) {
+                $w = '(' . $where . $db->quoteInto(
+                    ' AND calendar2.visibility != ?',
+                    (int) self::VISIBILITY_PRIVATE
+                ) . ')';
+            }
+            $where .= $w;
         }
+
         //TODO: This might query a lot of objects. Consider saving the last
         //      date of occurrence too so this is faster.
-        $where .= $db->quoteInto('AND start <= ?', $end->format('Y-m-d H:i:s'));
-        $join   = 'JOIN calendar2_user_relation '
+        $join  = 'JOIN calendar2_user_relation '
                     . 'ON calendar2.id = calendar2_user_relation.calendar2_id';
+        // We order by id so that we can remove duplicates in linear time in
+        // php. As id is an index on calendar2, this should not impact
+        // performance much. (This is a guess, not a measurement.)
+        $order  = 'calendar2.id';
 
         // This is a horrible hack. Phprojekt_ActiveRecord_Abstract::fetchAll is
         // not static, but has to be called that way because we need events that
         // the current user might not have rights to see.
         $models = Phprojekt_ActiveRecord_Abstract::fetchAll(
-            $where, null, null, null, null, $join
+            $where, $order, null, null, null, $join
         );
 
+        // If we have more than one user, we need to remove duplicated models
+        if (count($users) > 1) {
+            $lastId = -1; // Sql ids are always positive, so this is safe start.
+            foreach ($models as $key => $model) {
+                if ($model->id === $lastId) {
+                    unset($models[$key]);
+                } else {
+                    $lastId = $model->id;
+                }
+            }
+        }
 
         // Expand the recurrences.
         $ret = array();
