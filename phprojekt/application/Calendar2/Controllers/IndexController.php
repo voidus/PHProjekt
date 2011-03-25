@@ -71,14 +71,15 @@ class Calendar2_IndexController extends IndexController
             Phprojekt_ModelInformation_Default::ORDERING_LIST
         );
     }
+
     /**
      * Returns all events in the given period of time that the user is
      * involved in. Only days are recognized.
      *
      * Request parameters:
      * <pre>
-     *  - datetime Start
-     *  - datetime End
+     *  - datetime dateStart
+     *  - datetime dateEnd
      * </pre>
      */
     public function jsonPeriodListAction()
@@ -103,6 +104,63 @@ class Calendar2_IndexController extends IndexController
 
         $model  = new Calendar2_Models_Calendar2();
         $events = $model->fetchAllForPeriod($start, $end);
+
+        Phprojekt_Converter_Json::echoConvert(
+            $events,
+            Phprojekt_ModelInformation_Default::ORDERING_FORM
+        );
+    }
+
+    /**
+     * Returns all events in the given period that the given user(s) are
+     * involved in.
+     *
+     * Request parameters:
+     *  - datetime                      start
+     *  - datetime                      end
+     *  - integer or array of integers  users
+     */
+    public function jsonPeriodListSelectAction()
+    {
+        $start = $this->getRequest()->getParam('start');
+        $end   = $this->getRequest()->getParam('end');
+        $users = $this->getRequest()->getParam('users');
+
+        // Validate input
+        if (!Cleaner::validate('isoDate', $start)) {
+            throw new Phprojekt_PublishedException(
+                "Invalid start '$start'"
+            );
+        }
+        if (!Cleaner::validate('isoDate', $end)) {
+            throw new Phprojekt_PublishedException("Invalid end $end");
+        }
+        if (Cleaner::validate('int', $users)) {
+            $users = array((int) $users);
+        } else if (is_array($users)) {
+            foreach ($users as $key => $user) {
+                if (!Cleaner::validate('int', $users)) {
+                    throw new Phprojekt_PublishedException(
+                        "Invalid user id '$user'"
+                    );
+                }
+                $users[$key] = (int) $user;
+            }
+        } else {
+            throw new Phprojekt_PublishedException(
+                "Invalid users '$users'"
+            );
+        }
+
+        // Adjust the times so that all events on that days are retrieved
+        $timezone = $this->_getUserTimezone();
+        $start = new Datetime($start, $timezone);
+        $start->setTime(0, 0, 0);
+        $end = new Datetime($end, $timezone);
+        $end->setTime(23, 59, 59);
+
+        $model  = new Calendar2_Models_Calendar2();
+        $events = $model->fetchAllForPeriod($start, $end, $users);
 
         Phprojekt_Converter_Json::echoConvert(
             $events,
