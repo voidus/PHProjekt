@@ -32,7 +32,6 @@ dojo.declare("phpr.Calendar2.DefaultView", phpr.Component, {
     //    information we receive from our Server in a HTML table.
     main:                 null,
     id:                   0,
-    url:                  null,
     updateUrl:            null,
     _tagUrl:              null,
     _date:                null,
@@ -92,17 +91,8 @@ dojo.declare("phpr.Calendar2.DefaultView", phpr.Component, {
         this.updateUrl = updateUrl;
         this.main      = main;
         this.id        = id;
-        this.url       = null;
         this._date     = date;
-
-        this.beforeConstructor();
-
-        if (users != null) {
-            // Just for the Day group view
-            this.users = users;
-        }
-
-        this.setUrl();
+        this.users = users;
 
         if (dojo.isIE) {
             // This is to avoid a pair of scrollbars that eventually appears (not when first loading)
@@ -115,15 +105,39 @@ dojo.declare("phpr.Calendar2.DefaultView", phpr.Component, {
         // Draw the tags
         this.showTags();
 
-        this.afterConstructor();
-    },
+        var dates = this.getDateRange();
+        if (users == null) {
+            // There are no users given, so we'll get the data for the current
+            // user.
+            this.url = phpr.webpath + 'index.php/Calendar2/index/'
+                        + 'jsonPeriodList/dateStart/' + dates['start']
+                        + '/dateEnd/' + dates['end'];
 
-    beforeConstructor:function() {
-        // Summary:
-        //    Function called almost at the top of 'constructor' function.
-        // Description:
-        //    If there is something that must be done before executing the most of sentences of 'constructor' function,
-        //    inherit this function and put it inside it.
+            phpr.DataStore.addStore({url: this.url, noCache: true});
+            phpr.DataStore.requestData({
+                url:         this.url,
+                processData: dojo.hitch(this, "onLoaded")
+            });
+        } else {
+            var users           = this.users.join(",");
+            this._headerDataUrl = phpr.webpath + 'index.php/Calendar2/index'
+                                  + '/jsonGetSpecificUsers/users/' + users;
+            phpr.DataStore.addStore({url: this._headerDataUrl, noCache: true});
+            phpr.DataStore.requestData({
+                url:         this._headerDataUrl,
+                processData: dojo.hitch(this, function() {
+                    this.url  = phpr.webpath + 'index.php/Calendar2/index/'
+                                + 'jsonPeriodListSelect/dateStart/'
+                                + dates['start'] + '/dateEnd/' + dates['end']
+                                + '/users/' + users;
+                    phpr.DataStore.addStore({url: this.url, noCache: true});
+                    phpr.DataStore.requestData({
+                        url:         this.url,
+                        processData: dojo.hitch(this, "onLoaded")
+                    });
+                })
+            });
+        }
     },
 
     showTags:function() {
@@ -152,6 +166,26 @@ dojo.declare("phpr.Calendar2.DefaultView", phpr.Component, {
             this._exportButton = new dijit.form.Button(params);
             dojo.byId("buttonRow").appendChild(this._exportButton.domNode);
             dojo.connect(this._exportButton, "onClick", dojo.hitch(this, "exportData"));
+        }
+    },
+
+    exportData:function() {
+        var dates = this.getDateRange();
+        if (this.users === null) {
+            window.open(
+                phpr.webpath + 'index.php/Calendar2/index/'
+                    + 'csvPeriodList/nodeId/1/dateStart/' + dates['start']
+                    + '/dateEnd/' + dates['end']
+                    + '/csrfToken/' + phpr.csrfToken
+            );
+        } else {
+            window.open(
+                phpr.webpath + 'index.php/Calendar2/index/csvPeriodListSelect'
+                    + '/nodeId/1/dateStart/' + dates['start']
+                    + '/dateEnd/' + dates['end']
+                    + '/users/' + this.users.join(',')
+                    + '/csrfToken/' + phpr.csrfToken
+            );
         }
     },
 

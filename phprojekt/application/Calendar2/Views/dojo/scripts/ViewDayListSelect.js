@@ -29,41 +29,20 @@ dojo.declare("phpr.Calendar2.ViewDayListSelect", phpr.Calendar2.DefaultView, {
     _furtherEvents :  Array(),
     _maxSimultEvents: 1,
     events:           Array(),
-    users:            Array(),
 
-    afterConstructor:function() {
-        // Summary:
-        // Request header data
-        var users           = this.users.join(",");
-        this._headerDataUrl = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonGetSpecificUsers/users/' + users;
-        phpr.DataStore.addStore({url: this._headerDataUrl, noCache: true});
-        phpr.DataStore.requestData({url: this._headerDataUrl, processData: dojo.hitch(this, "onLoadedHeader")});
+    getDateRange:function() {
+        return {
+            start: this._date,
+            end:   this._date
+        };
     },
 
-    onLoadedHeader:function() {
-        // Summary:
-        //    After the table header has been loaded, this function is called to load the events.
-        phpr.DataStore.addStore({url: this.url, noCache: true});
-        phpr.DataStore.requestData({url: this.url, processData: dojo.hitch(this, "onLoadedEvents")});
-    },
-
-    setUrl:function() {
-        // Summary:
-        //    Sets the url to get the data from
-        // Description:
-        //    Sets the url for get the data from
-        var users = this.users.join(",");
-        this.url  = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonDayListSelect/date/' + this._date
-            + '/users/' + users;
-    },
-
-    onLoadedEvents:function(dataContent) {
+    onLoaded:function(dataContent) {
         // Summary:
         //    This function is called when the request to the DB is received
         // Description:
         //    It parses that json info and prepares an apropriate array so that the template can render
-        // appropriately the TABLE html element.
-
+        //    appropriately the TABLE html element.
         var meta = phpr.DataStore.getMetaData({url: this.url});
 
         // Render Export buttons?
@@ -99,16 +78,6 @@ dojo.declare("phpr.Calendar2.ViewDayListSelect", phpr.Calendar2.DefaultView, {
 
         this.setVarsAndDivs();
         this.classesSetup(true);
-    },
-
-    exportData:function() {
-        // Summary:
-        //    Open a new window in CSV mode
-        var users = this.users.join(",");
-        window.open(phpr.webpath + 'index.php/' + phpr.module + '/index/csvDayListSelect/nodeId/1/date/' + this._date
-            + '/users/' + users + '/csrfToken/' + phpr.csrfToken);
-
-        return false;
     },
 
     fillHeaderArray:function() {

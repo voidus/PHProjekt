@@ -32,17 +32,11 @@ dojo.declare("phpr.Calendar2.ViewDayListSelf", phpr.Calendar2.DefaultView, {
     _maxSimultEvents: 1,
     events:           Array(),
 
-    afterConstructor:function() {
-        // Summary:
-        //    Loads the data from the database
-        phpr.DataStore.addStore({url: this.url, noCache: true});
-        phpr.DataStore.requestData({url: this.url, processData: dojo.hitch(this, "onLoaded")});
-    },
-
-    setUrl:function() {
-        // Summary:
-        //    Sets the url to get the data from
-        this.url = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonDayListSelf/date/' + this._date;
+    getDateRange:function() {
+        return {
+            start: this._date,
+            end:   this._date
+        };
     },
 
     onLoaded:function(dataContent) {
@@ -84,14 +78,5 @@ dojo.declare("phpr.Calendar2.ViewDayListSelf", phpr.Calendar2.DefaultView, {
 
         this.setVarsAndDivs();
         this.classesSetup(true);
-    },
-
-    exportData:function() {
-        // Summary:
-        //    Open a new window in CSV mode
-        window.open(phpr.webpath + 'index.php/' + phpr.module + '/index/csvDayListSelf/nodeId/1/date/' + this._date
-            + '/csrfToken/' + phpr.csrfToken);
-
-        return false;
     }
 });

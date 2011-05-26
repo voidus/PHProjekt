@@ -28,30 +28,21 @@ dojo.declare("phpr.Calendar2.ViewMonthList", phpr.Calendar2.DefaultView, {
     //    This Class takes care of displaying the list information we receive from our Server in a HTML table
     _header:              Array(7),
     _scrollLastDirection: 0,
+    _schedule:            null,
 
     COLOR_WEEKDAY:      '#FFFFFF',
     COLOR_WEEKEND:      '#EFEFEF',
     COLOR_TODAY:        '#DEEBF7',
     COLOR_OUT_OF_MONTH: '#DEDFDE',
 
-    beforeConstructor:function() {
-        // Summary:
-        //    Calls the schedule array basic filling function, before constructor function
-        this.fillScheduleArrayPart1();
-    },
-
-    afterConstructor:function() {
-        // Summary:
-        //    Loads the data from the database
-        phpr.DataStore.addStore({url: this.url, noCache: true});
-        phpr.DataStore.requestData({url: this.url, processData: dojo.hitch(this, "onLoaded")});
-    },
-
-    setUrl:function() {
-        // Summary:
-        //    Sets the url to get the data from
-        this.url = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonPeriodList/dateStart/'
-            + this._schedule[0][0]['date'] + '/dateEnd/' + this._schedule[this._schedule.length - 1][6]['date'];
+    getDateRange:function() {
+        if (this._schedule === null) {
+            this.fillScheduleArrayPart1();
+        }
+        return {
+            start: this._schedule[0][0]['date'],
+            end:   this._schedule[this._schedule.length - 1][6]['date']
+        };
     },
 
     onLoaded:function(dataContent) {
@@ -78,22 +69,6 @@ dojo.declare("phpr.Calendar2.ViewMonthList", phpr.Calendar2.DefaultView, {
             schedule:   this._schedule
         });
         dojo.publish('Calendar2.connectMouseScroll');
-    },
-
-    exportData:function() {
-        // Summary:
-        //    Opens a new window in CSV mode
-        var dateTemp = phpr.Date.isoDateTojsDate(this._date);
-        dateTemp.setDate(1);
-        var firstDayMonth = phpr.Date.getIsoDate(dateTemp);
-        var daysInMonth   = dojo.date.getDaysInMonth(dateTemp);
-        dateTemp.setDate(daysInMonth);
-        var lastDayMonth = phpr.Date.getIsoDate(dateTemp);
-
-        window.open(phpr.webpath + 'index.php/' + phpr.module + '/index/csvPeriodList/nodeId/1/dateStart/'
-            + firstDayMonth + '/dateEnd/' + lastDayMonth + '/csrfToken/' + phpr.csrfToken);
-
-        return false;
     },
 
     fillScheduleArrayPart1:function() {
@@ -293,3 +268,4 @@ dojo.declare("phpr.Calendar2.ViewMonthList", phpr.Calendar2.DefaultView, {
         return result;
     }
 });
+

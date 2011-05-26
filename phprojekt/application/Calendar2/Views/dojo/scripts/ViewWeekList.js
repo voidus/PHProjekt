@@ -28,29 +28,19 @@ dojo.declare("phpr.Calendar2.ViewWeekList", phpr.Calendar2.DefaultView, {
     //    This Class takes care of displaying the list information we receive from our Server in a HTML table
     _header:              Array(7),
     _furtherEvents:       Array(),
-    _weekDays:            Array(7),
+    _weekDays:            null,
     events:               Array(),
     _htmlEventDivsAmount: null,
     _cellDayHeight:       null,
 
-    beforeConstructor:function() {
-        // Summary:
-        //    Calls the weekDays array creation function, before constructor function
-        this.setWeekDays();
-    },
-
-    afterConstructor:function() {
-        // Summary:
-        //    Loads the data from the database
-        phpr.DataStore.addStore({url: this.url, noCache: true});
-        phpr.DataStore.requestData({url: this.url, processData: dojo.hitch(this, "onLoaded")});
-    },
-
-    setUrl:function() {
-        // Summary:
-        //    Sets the url to get the data from
-        this.url = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonPeriodList/dateStart/' + this._weekDays[0]
-            + '/dateEnd/' + this._weekDays[6];
+    getDateRange:function() {
+        if (this._weekDays === null) {
+            this.setWeekDays();
+        }
+        return {
+            start: this._weekDays[0],
+            end:   this._weekDays[6]
+        };
     },
 
     onLoaded:function(dataContent) {
@@ -66,6 +56,7 @@ dojo.declare("phpr.Calendar2.ViewWeekList", phpr.Calendar2.DefaultView, {
 
         var content = phpr.DataStore.getData({url: this.url});
 
+        // Fill the structure and data of the main arrays
         this._schedule = new Array(24);
         this.fillHeaderArray();
         this.fillScheduleArray();
@@ -95,20 +86,12 @@ dojo.declare("phpr.Calendar2.ViewWeekList", phpr.Calendar2.DefaultView, {
         this.classesSetup(true);
     },
 
-    exportData:function() {
-        // Summary:
-        //    Opens a new window in CSV mode
-        window.open(phpr.webpath + 'index.php/' + phpr.module + '/index/csvPeriodList/nodeId/1/dateStart/'
-            + this._weekDays[0] + '/dateEnd/' + this._weekDays[6] + '/csrfToken/' + phpr.csrfToken);
-
-        return false;
-    },
-
     setWeekDays:function() {
         // Summary:
         //    Fills the weekDays array with all the dates of the selected week in string format.
         var selectedDate = phpr.Date.isoDateTojsDate(this._date);
         var dayTemp;
+        this._weekDays = [];
 
         for (var i = 0; i < 7; i ++) {
             dayTemp           = dojo.date.add(selectedDate, 'day', i + 1 - selectedDate.getDay());

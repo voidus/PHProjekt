@@ -403,8 +403,8 @@ class Calendar2_Models_Calendar2 extends Phprojekt_Item_Abstract
      * Get all events in the period that the currently active user participates
      * in. Both given times are inclusive.
      *
-     * Note that even if $user is given and different from the current user,
-     * only public events will be returned.
+     * Note that if the current user does not participate in a event,
+     * it will only be shown by this method if it's public.
      *
      * @param Datetime  $start The start of the period.
      * @param Datetime  $end   The end of the period.
@@ -426,26 +426,47 @@ class Calendar2_Models_Calendar2 extends Phprojekt_Item_Abstract
 
         // Query the database for the events.
         $db    = $this->getAdapter();
-        $where = $db->quoteInto('start <= ?', $end->format('Y-m-d H:i:s'));
-        foreach ($users as $user) {
-            $w = $db->quoteInto(
-                'calendar2_user_relation.user_id = ? ',
-                (int) $users
-            );
+        $where = '';
 
-            if (Phprojekt_Auth::getUserId() != $users) {
-                $w = '(' . $where . $db->quoteInto(
-                    ' AND calendar2.visibility != ?',
-                    (int) self::VISIBILITY_PRIVATE
-                ) . ')';
+        if ($users == array(Phprojekt_Auth::getUserId())) {
+            $where .= $db->quoteInto('calendar2_user_relation.user_id = ?', Phprojekt_Auth::getUserId());
+        } else {
+            // We're building a query like this:
+            //                  vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv only if other users are participating
+            // start < ... AND ((public AND (user = x OR user = y OR ...)) OR user = current)
+            //                                                            ^^^^^^^^^^^^^^^^^^
+            //                                                             Only if the current user is in $users
+            $where .= $db->quoteInto('(calendar2.visibility != ? AND (', (int) self::VISIBILITY_PRIVATE);
+            $includesCurrentUser = false;
+            $first = true;
+            foreach ($users as $user) {
+                if ($user == Phprojekt_Auth::getUserId()) {
+                    // We handle this seperately
+                    $includesCurrentUser = true;
+                } else {
+                    if (!$first) {
+                        $where .= ' OR ';
+                    } else {
+                        $first = false;
+                    }
+
+                    $where .= $db->quoteInto(
+                        'calendar2_user_relation.user_id = ?',
+                        (int) $user
+                    );
+                }
             }
-            $where .= $w;
+            $where .= '))'; // close the () before visibility != private
+
+            if (in_array(Phprojekt_Auth::getUserId(), $users)) {
+                $where .= $db->quoteInto(' OR calendar2_user_relation.user_id = ?', Phprojekt_Auth::getUserId());
+            }
         }
+        $where = $db->quoteInto('calendar2.start <= ? AND ', $end->format('Y-m-d H:i:s')) . "(${where})";
 
         //TODO: This might query a lot of objects. Consider saving the last
         //      date of occurrence too so this is faster.
-        $join  = 'JOIN calendar2_user_relation '
-                    . 'ON calendar2.id = calendar2_user_relation.calendar2_id';
+        $join  = 'JOIN calendar2_user_relation ON calendar2.id = calendar2_user_relation.calendar2_id';
         // We order by id so that we can remove duplicates in linear time in
         // php. As id is an index on calendar2, this should not impact
         // performance much. (This is a guess, not a measurement.)
@@ -454,6 +475,7 @@ class Calendar2_Models_Calendar2 extends Phprojekt_Item_Abstract
         // This is a horrible hack. Phprojekt_ActiveRecord_Abstract::fetchAll is
         // not static, but has to be called that way because we need events that
         // the current user might not have rights to see.
+        Phprojekt::getInstance()->getLog()->debug($where);
         $models = Phprojekt_ActiveRecord_Abstract::fetchAll(
             $where, $order, null, null, null, $join
         );

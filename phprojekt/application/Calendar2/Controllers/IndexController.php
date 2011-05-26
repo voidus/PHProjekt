@@ -116,15 +116,16 @@ class Calendar2_IndexController extends IndexController
      * involved in.
      *
      * Request parameters:
-     *  - datetime                      start
-     *  - datetime                      end
-     *  - integer or array of integers  users
+     *  - datetime start
+     *  - datetime end
+     *  - string   users    user ids, separated by commas
      */
     public function jsonPeriodListSelectAction()
     {
-        $start = $this->getRequest()->getParam('start');
-        $end   = $this->getRequest()->getParam('end');
+        $start = $this->getRequest()->getParam('dateStart');
+        $end   = $this->getRequest()->getParam('dateEnd');
         $users = $this->getRequest()->getParam('users');
+        $users = explode(',', $users);
 
         // Validate input
         if (!Cleaner::validate('isoDate', $start)) {
@@ -135,21 +136,13 @@ class Calendar2_IndexController extends IndexController
         if (!Cleaner::validate('isoDate', $end)) {
             throw new Phprojekt_PublishedException("Invalid end $end");
         }
-        if (Cleaner::validate('int', $users)) {
-            $users = array((int) $users);
-        } else if (is_array($users)) {
-            foreach ($users as $key => $user) {
-                if (!Cleaner::validate('int', $users)) {
-                    throw new Phprojekt_PublishedException(
-                        "Invalid user id '$user'"
-                    );
-                }
-                $users[$key] = (int) $user;
+        foreach ($users as $key => $user) {
+            if (!Cleaner::validate('int', $user)) {
+                throw new Phprojekt_PublishedException(
+                    "Invalid user id '$user'"
+                );
             }
-        } else {
-            throw new Phprojekt_PublishedException(
-                "Invalid users '$users'"
-            );
+            $users[$key] = (int) $user;
         }
 
         // Adjust the times so that all events on that days are retrieved

@@ -56,13 +56,6 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         dojo.subscribe(this.module + ".connectViewResize", this, "connectViewResize");
         dojo.subscribe(this.module + ".saveChanges", this, "saveChanges");
         dojo.subscribe(this.module + ".enableEventDivClick", this, "enableEventDivClick");
-
-        this.gridWidget          = phpr.Calendar2.Grid;
-        this.dayListSelfWidget   = phpr.Calendar2.ViewDayListSelf;
-        this.dayListSelectWidget = phpr.Calendar2.ViewDayListSelect;
-        this.weekListWidget      = phpr.Calendar2.ViewWeekList;
-        this.monthListWidget     = phpr.Calendar2.ViewMonthList;
-        this.formWidget          = phpr.Calendar2.Form;
     },
 
     renderTemplate:function() {
@@ -111,7 +104,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         this.setNewEntry();
         var updateUrl = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonSaveMultiple/nodeId/'
             + phpr.currentProjectId;
-        this.grid = new this.gridWidget(updateUrl, this, phpr.currentProjectId);
+        this.grid = new phpr.Calendar2.Grid(updateUrl, this, phpr.currentProjectId);
         this.setSubmoduleNavigation();
         this.setScheduleBar(false, false);
         this._actionPending = false;
@@ -129,7 +122,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         var dateString = phpr.Date.getIsoDate(this._date);
         var updateUrl  = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonSaveMultiple/nodeId/'
             + phpr.currentProjectId;
-        this.dayListSelf = new this.dayListSelfWidget(updateUrl, phpr.currentProjectId, dateString, null, this);
+        this.dayListSelf = new phpr.Calendar2.ViewDayListSelf(updateUrl, phpr.currentProjectId, dateString, null, this);
         this.setSubmoduleNavigation();
         this.setScheduleBar(true, true);
     },
@@ -145,7 +138,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         var dateString = phpr.Date.getIsoDate(this._date);
         var updateUrl  = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonSaveMultiple/nodeId/'
             + phpr.currentProjectId;
-        this.dayListSelect = new this.dayListSelectWidget(updateUrl, phpr.currentProjectId, dateString,
+        this.dayListSelect = new phpr.Calendar2.ViewDayListSelect(updateUrl, phpr.currentProjectId, dateString,
             this._usersSelected, this);
         this.setSubmoduleNavigation();
         this.setScheduleBar(true, true);
@@ -162,7 +155,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         var dateString = phpr.Date.getIsoDate(this._date);
         var updateUrl  = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonSaveMultiple/nodeId/'
             + phpr.currentProjectId;
-        this.weekList = new this.weekListWidget(updateUrl, phpr.currentProjectId, dateString, null, this);
+        this.weekList = new phpr.Calendar2.ViewWeekList(updateUrl, phpr.currentProjectId, dateString, null, this);
         this.setSubmoduleNavigation();
         this.setScheduleBar(true, false);
     },
@@ -176,7 +169,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         phpr.destroySubWidgets('buttonRow');
         this.setNewEntry();
         var dateString = phpr.Date.getIsoDate(this._date);
-        this.monthList = new this.monthListWidget(this, phpr.currentProjectId, dateString);
+        this.monthList = new phpr.Calendar2.ViewMonthList(this, phpr.currentProjectId, dateString);
         this.setSubmoduleNavigation();
         this.setScheduleBar(true, false);
     },
@@ -352,7 +345,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
             params['start'] = startDate;
         }
 
-        this.form = new this.formWidget(this, id, module, params);
+        this.form = new phpr.Calendar2.Form(this, id, module, params);
     },
 
     userSelfClick:function() {
@@ -418,6 +411,7 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         this._usersSelected = new Array();
         dijit.byId('selectorDialog').hide();
 
+        //ASDFG
         // The userList array comes with lots and lots of string indexes apart from the number indexes (these last ones
         // are the correct ones). This seems to be a Dojo bug. So, here it will be picked up the only the ones that
         // matter.
@@ -497,12 +491,8 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
                        + '<table><tr>';
 
         var moduleViews = new Array();
-        if (!this.isListActive('dayList')) {
-            this.addModuleView(moduleViews, phpr.nls.get('Self'), 'userSelfClick', true);
-        } else {
-            this.addModuleView(moduleViews, phpr.nls.get('Self'), 'userSelfClick', !this._usersSelectionMode);
-            this.addModuleView(moduleViews, phpr.nls.get('Selection'), 'userSelectionClick', this._usersSelectionMode);
-        }
+        this.addModuleView(moduleViews, phpr.nls.get('Self'), 'userSelfClick', !this._usersSelectionMode);
+        this.addModuleView(moduleViews, phpr.nls.get('Selection'), 'userSelectionClick', this._usersSelectionMode);
 
         for (var i = 0; i < moduleViews.length; i++) {
             var liclass = '';
