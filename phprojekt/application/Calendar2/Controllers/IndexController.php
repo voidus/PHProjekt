@@ -183,6 +183,56 @@ class Calendar2_IndexController extends IndexController
     }
 
     /**
+     * Retrieves all events that are connected to a project for a given period of time.
+     * This means all events that anybody with read access for the project is involved in.
+     *
+     * Request parameters:
+     * <pre>
+     *  - Integer  id    The id of the project. (NOTE: Maybe also allow project names? Unique?)
+     *  - Datetime start Start of the period in UTC.
+     *  - Datetime end   End of the period in UTC.
+     * </pre>
+     */
+    public function jsonProjectListAction()
+    {
+        // Retrieve values from the request
+        $id    = $this->getRequest()->getParam('id');
+        $start = $this->getRequest()->getParam('start');
+        $end   = $this->getRequest()->getParam('end');
+
+        // Check for invalid parameters
+        if (!Cleaner::validate('int', $start)) {
+            throw new Phprojekt_PublishedException(
+                "Invalid project id '$id'"
+            );
+        }
+        if (!Cleaner::validate('isoDate', $start)) {
+            throw new Phprojekt_PublishedException(
+                "Invalid Start '$start'"
+            );
+        }
+        if (!Cleaner::validate('isoDate', $end)) {
+            throw new Phprojekt_PublishedException("Invalid End $end");
+        }
+
+        // Convert to internal representation
+        $id    = (int) $id;
+        $utc   = new DateTimeZone('UTC');
+        $start = new DateTime($start, $utc);
+        $end   = new DateTime($end, $utc);
+
+        // Retrieve the events
+        $project = new Project_Models_Project();
+        if (!$project = $project->find($id)) {
+            throw new Phprojekt_PublishedException("Project with id $id not found.");
+        }
+        $users   = $project->getUsersWithRights();
+
+        $calendar = new Calendar2_Models_Calendar2;
+        $events   = $calendar->fetchAllForMultipleUsers($users, $start, $end);
+    }
+
+    /**
      * Saves the current item.
      *
      * If the request parameter "id" is null or 0, the function will add a new
