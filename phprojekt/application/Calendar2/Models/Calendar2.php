@@ -538,6 +538,39 @@ class Calendar2_Models_Calendar2 extends Phprojekt_Item_Abstract
     }
 
     /**
+     * Fetches all events for multiple users in a given period.
+     *
+     * @param array of int $users the user ids.
+     * @param datetime     $start The start of the period.
+     * @param datetime     $end   The end of the period.
+     *
+     * @return array of Calendar2_Models_Calendar2 The events.
+     */
+    public function fetchAllForMultipleUsers($users, $start, $end)
+    {
+        // We build an two-dimensional array of the form
+        // {
+        //   id => {
+        //           recurrenceId => event
+        //         }
+        // }
+        // to make sure that we have each occurrence only once.
+        $events = array();
+        foreach ($users as $user) {
+            foreach ($this->fetchAllForPeriod($start, $end, $user) as $event) {
+                $events[$event->id][$event->recurrenceId] = $event;
+            }
+        }
+        // Then we flatten it
+        $ret = array();
+        foreach ($events as $byId) foreach ($byId as $event) {
+            $ret[] = $event;
+        }
+
+        return $ret;
+    }
+
+    /**
      * Find a special occurrence based on a id and a recurrence id.
      * Will throw an exception for invalid values.
      *

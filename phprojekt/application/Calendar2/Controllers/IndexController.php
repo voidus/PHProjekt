@@ -175,28 +175,9 @@ class Calendar2_IndexController extends IndexController
         $end = clone $start;
         $end->setTime(23, 59, 59);
 
-        // We build an two-dimensional array of the form
-        // {
-        //   id => {
-        //           recurrenceId => event
-        //         }
-        // }
-        // to make sure that we have each occurrence only once.
-        $events = array();
-        foreach ($users as $user) {
-            $model    = new Calendar2_Models_Calendar2();
-            foreach ($model->fetchAllForPeriod($start, $end, $user) as $event) {
-                $events[$event->id][$event->recurrenceId] = $event;
-            }
-        }
-        // Then we flatten it to send it to the client
-        $ret = array();
-        foreach ($events as $byId) foreach ($byId as $event) {
-            $ret[] = $event;
-        }
-
+        $calendar = new Calendar2_Models_Calendar2();
         Phprojekt_Converter_Json::echoConvert(
-            $ret,
+            $calendar->fetchAllForMultipleUsers($users, $start, $end),
             Phprojekt_ModelInformation_Default::ORDERING_FORM
         );
     }
