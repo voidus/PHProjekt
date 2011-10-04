@@ -284,29 +284,40 @@ class Phprojekt_Item_Rights extends Zend_Db_Table_Abstract
     }
 
     /**
-     * Return all the users with at least one right for a moduleId-ItemId pair.
+     * Returns all users that have a given right (or any right if none is given) on an item.
      *
      * @param string  $moduleId The module ID.
      * @param integer $itemId   The item ID.
+     * @param int     $rights   A bitmask of rights (Constants in Phprojekt_Acl). All users with any rights will be
+     *                              returned if null or omitted.
+     * @param bool    $exact    Only get users with exact $rights instead of all users that have at least $rights.
+     *                              Default is false.
      *
      * @return array Array of user IDs.
      */
-    public function getUsersWithRight($moduleId, $itemId)
+    public function getUsersWithRight($moduleId, $itemId, $rights = null, $exact = false)
     {
-        // Cache the query
-        $sessionName    = 'Phprojekt_Item_Rights-getUsersWithRight' . '-' . $moduleId . '-' . $itemId;
-        $rightNamespace = new Zend_Session_Namespace($sessionName);
-
-        if (!isset($rightNamespace->right)) {
-            $values = array();
-            $where  = sprintf('module_id = %d AND item_id = %d AND access > 0', (int) $moduleId, (int) $itemId);
-            $rows   = $this->fetchAll($where)->toArray();
-            foreach ($rows as $row) {
-                $values[] = $row['user_id'];
-            }
-            $rightNamespace->right = $values;
+        if (is_null($rights)) {
+            // If rights is not given, exact must be false, so this will fetch all users.
+            $rights = Phprojekt_Acl::NONE;
         }
 
-        return $rightNamespace->right;
+        $db = Phprojekt::getInstance()->getDb();
+
+        $sql  = 'SELECT user_id FROM item_rights';
+        $sql .= $db->quoteInto(' WHERE module_id = ? AND item_id = ?', (int) $moduleId, (int) $itemId);
+
+        if (is_null($rights)) {
+            $sql .= ' AND access > 0';
+        } else if ($exact) {
+            $sql .= $db->quoteInto(' AND access = ?', (int) $rights);
+        } else {
+            $sql .= $db->quoteInto(' AND access & ?', (int) $rights);
+        }
+
+        $ids = $db->fetchCol($sql);
+        //$rows   = $this->fetchAll($where)->toArray();
+        Phprojekt::getInstance()->getLog()->debug(print_r($ids, true));
+        return $ids;
     }
 }
