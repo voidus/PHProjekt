@@ -1,0 +1,109 @@
+{
+
+"6.1.0-dev":
+{
+    "structure":
+    {
+        "resource":
+        {
+            "create":
+            {
+                "id":          "default",
+                "owner_id":    {"type": "int"},
+                "project_id":  {"type": "int"},
+                "name":        {"type": "text"},
+                "description": {"type": "text"}
+            }
+        }
+    },
+
+    "initialData":
+    {
+        "database_manager":
+        {
+            "insert":
+            [
+                {
+                    "table_name":      "resource",
+                    "table_field":     "name",
+                    "form_tab":        "1",
+                    "form_label":      "Name",
+                    "form_type":       "text",
+                    "form_position":   "1",
+                    "form_columns":    "1",
+                    "form_regexp":     "NULL",
+                    "form_range":      "NULL",
+                    "default_value":   "NULL",
+                    "list_position":   "1",
+                    "list_align":      "center",
+                    "list_use_filter": "1",
+                    "alt_position":    "0",
+                    "status":          "1",
+                    "is_integer":      "0",
+                    "is_required":     "1",
+                    "is_unique":       "1"
+                },
+                {
+                    "table_name":      "resource",
+                    "table_field":     "description",
+                    "form_tab":        "1",
+                    "form_label":      "Description",
+                    "form_type":       "text",
+                    "form_position":   "2",
+                    "form_columns":    "1",
+                    "form_regexp":     "NULL",
+                    "form_range":      "NULL",
+                    "default_value":   "NULL",
+                    "list_position":   "2",
+                    "list_align":      "center",
+                    "list_use_filter": "1",
+                    "alt_position":    "0",
+                    "status":          "1",
+                    "is_integer":      "0",
+                    "is_required":     "0",
+                    "is_unique":       "0"
+                }
+            ]
+        },
+
+        "module":
+        {
+            "insert":
+            [
+                {
+                    "name":      "Resource",
+                    "label":     "Resource",
+                    "save_type": "1",
+                    "active":    "1",
+                    "_relations":
+                    {
+                        "project_module_permissions":
+                        {
+                            "insert":
+                            [
+                                {
+                                    "module_id":  "##id##",
+                                    "project_id": "1"
+                                }
+                            ]
+                        },
+
+                        "role_module_permissions":
+                        {
+                            "insert":
+                            [
+                                {
+                                    "module_id": "##id##",
+                                    "role_id":   "1",
+                                    "access":    "139"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
+
+}
