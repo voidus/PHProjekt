@@ -107,7 +107,6 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         dojo.subscribe(this.module + ".setDate", this, "setDate");
         dojo.subscribe(this.module + ".userSelectionClick", this, "userSelectionClick");
         dojo.subscribe(this.module + ".anotherViewDayClick", this, "anotherViewDayClick");
-        dojo.subscribe(this.module + ".loadAppropriateList", this, "loadAppropriateList");
         dojo.subscribe(this.module + ".connectMouseScroll", this, "connectMouseScroll");
         dojo.subscribe(this.module + ".scrollDone", this, "scrollDone");
         dojo.subscribe(this.module + ".connectViewResize", this, "connectViewResize");
@@ -173,11 +172,10 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         // Summary:
         //    Loads the appropriate list of events
         switch (this.state.action) {
+            case "dayList":
             case "dayListSelf":
-                this.loadDayListSelf();
-                break;
             case "dayListSelect":
-                this.loadDayListSelect();
+                this.loadDayList();
                 break;
             case "weekList":
                 this.loadWeekList();
@@ -212,6 +210,14 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         this.grid = new this.gridWidget(updateUrl, this, phpr.currentProjectId, gridBoxContainer, {userId: this.getActiveUser().id});
         this.setSubmoduleNavigation();
         this.setScheduleBar(false, false);
+    },
+
+    loadDayList: function() {
+        if (this._usersSelectionMode) {
+            this.loadDayListSelect();
+        } else {
+            this.loadDayListSelf();
+        }
     },
 
     loadDayListSelf: function() {
@@ -262,7 +268,9 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         var dateString = phpr.date.getIsoDate(this._date);
         var updateUrl  = phpr.webpath + 'index.php/' + phpr.module + '/index/jsonSaveMultiple/nodeId/'
             + phpr.currentProjectId + '/userId/' + this.getActiveUser().id;
-        this.weekList = new this.weekListWidget(updateUrl, phpr.currentProjectId, dateString, null, this);
+
+        var users = this._usersSelectionMode ? this._usersSelected : [this._getCurrentUser()];
+        this.weekList = new this.weekListWidget(updateUrl, phpr.currentProjectId, dateString, users, this);
         this.setSubmoduleNavigation();
         this.setScheduleBar(true, false);
     },
@@ -276,7 +284,9 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         phpr.viewManager.getView().buttonRow.set('content', '');
         this.setNewEntry();
         var dateString = phpr.date.getIsoDate(this._date);
-        this.monthList = new this.monthListWidget(this, phpr.currentProjectId, dateString, null, this);
+
+        var users = this._usersSelectionMode ? this._usersSelected : [this._getCurrentUser()];
+        this.monthList = new this.monthListWidget(this, phpr.currentProjectId, dateString, users, this);
         this.setSubmoduleNavigation();
         this.setScheduleBar(true, false);
     },
@@ -463,7 +473,8 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         // window.
         this._usersSelectionMode = true;
         var newstate = dojo.clone(this.state);
-        newstate.action = "dayListSelect";
+        newstate.action = "dayListSelect"
+        newstate.mode = "select";
         phpr.pageManager.changeState(newstate, {noAction: true});
         this.userStore = new phpr.Default.System.Store.User();
         this.userStore.fetch(dojo.hitch(this, "selectorRender"));
@@ -518,7 +529,11 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         this._userSelector.destroy();
         delete this._userSelector;
 
-        this.loadDayListSelect();
+        var newstate = dojo.clone(this.state);
+        newstate.users = this._usersSelected.join(',');
+        phpr.pageManager.changeState(newstate, {noAction: true});
+
+        this.loadAppropriateList();
     },
 
     anotherViewDayClick: function(date) {
@@ -543,6 +558,9 @@ dojo.declare("phpr.Calendar2.Main", phpr.Default.Main, {
         //    Destroys the objects of the lists not being used
         if (mode != 'grid') {
             this.destroyGrid();
+        }
+        if (mode != 'dayList') {
+            this.dayList = null;
         }
         if (mode != 'dayListSelf') {
             this.dayListSelf = null;

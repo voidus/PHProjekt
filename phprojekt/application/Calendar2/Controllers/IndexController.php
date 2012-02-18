@@ -131,6 +131,8 @@ class Calendar2_IndexController extends IndexController
         $dateStart = $this->getRequest()->getParam('dateStart');
         $dateEnd   = $this->getRequest()->getParam('dateEnd');
         $userId    = $this->getRequest()->getParam('userId', (int) Phprojekt_Auth_Proxy::getEffectiveUserId());
+        $users     = $this->getRequest()->getParam('users');
+        $users     = explode(',', $users);
 
         if (!Cleaner::validate('isoDate', $dateStart)) {
             throw new Phprojekt_PublishedException(
@@ -147,13 +149,19 @@ class Calendar2_IndexController extends IndexController
                 "Invalid userId '$userId'"
             );
         }
-
         $userId = (int) $userId;
 
-        if (!Phprojekt_Auth_Proxy::hasProxyRightForUserById($userId)) {
-            throw new Phprojekt_PublishedException("Current user has no proxy rights for this user $userId");
+        if (!Phprojekt_Auth_Proxy::hasuserIdRightForUserById($userId)) {
+            throw new Phprojekt_PublishedException("Current user has no userId rights for this user $userId");
         } else {
-            Phprojekt_Auth_Proxy::switchToUserById($userId);
+            Phprojekt_Auth_userId::switchToUserById($userId);
+        }
+
+        foreach ($users as $index => $user) {
+            if (!Cleaner::validate('int', $user)) {
+                throw new Phprojekt_PublishedException("Invalid user '$user'");
+            }
+            $users[$index] = (int) $user;
         }
 
         $timezone = $this->_getUserTimezone();
@@ -162,11 +170,29 @@ class Calendar2_IndexController extends IndexController
         $end = new Datetime($dateEnd, $timezone);
         $end->setTime(23, 59, 59);
 
-        $model  = new Calendar2_Models_Calendar2();
-        $events = $model->fetchAllForPeriod($start, $end);
+
+        // We build an two-dimensional array of the form
+        // {
+        //   id => {
+        //           recurrenceId => event
+        //         }
+        // }
+        // to make sure that we have each occurrence only once.
+        $events = array();
+        foreach ($users as $user) {
+            $model    = new Calendar2_Models_Calendar2();
+            foreach ($model->fetchAllForPeriod($start, $end, $user) as $event) {
+                $events[$event->id][$event->recurrenceId] = $event;
+            }
+        }
+        // Then we flatten it to send it to the client
+        $ret = array();
+        foreach ($events as $byId) foreach ($byId as $event) {
+            $ret[] = $event;
+        }
 
         Phprojekt_Converter_Json::echoConvert(
-            $events,
+            $ret,
             Phprojekt_ModelInformation_Default::ORDERING_FORM
         );
     }
