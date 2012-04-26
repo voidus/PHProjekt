@@ -109,7 +109,7 @@ class Phprojekt_Search
     public function indexObjectItem($object)
     {
         $words    = array();
-        $moduleId = Phprojekt_Module::getId($object->getModelName());
+        $moduleId = Phprojekt_Module::getId($object->moduleName);
         $itemId   = $object->id;
 
         $wordsId = $this->_wordModule->deleteWords($moduleId, $itemId);
@@ -148,7 +148,7 @@ class Phprojekt_Search
      */
     public function deleteObjectItem($object)
     {
-        $moduleId = Phprojekt_Module::getId($object->getModelName());
+        $moduleId = Phprojekt_Module::getId($object->moduleName);
         $itemId   = $object->id;
 
         $this->deleteObjectItemByIds($moduleId, $itemId);

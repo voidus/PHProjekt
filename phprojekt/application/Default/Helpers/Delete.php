@@ -153,7 +153,7 @@ final class Default_Helpers_Delete
                 }
             }
 
-            if ($model->getModelName() == 'Project') {
+            if (get_class($model) === 'Project_Models_Project') {
                 return self::_deleteTree($model);
             } else {
                 return self::_deleteModel($model);

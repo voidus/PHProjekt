@@ -259,7 +259,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
      */
     public function delete()
     {
-        $moduleId = Phprojekt_Module::getId($this->getModelName());
+        $moduleId = Phprojekt_Module::getId($this->moduleName);
 
         $this->deleteUploadFiles();
         $this->_history->saveFields($this, 'delete');
@@ -327,7 +327,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
             $join .= sprintf(' INNER JOIN item_rights ON (item_rights.item_id = %s
                 AND item_rights.module_id = %d AND item_rights.user_id = %d) ',
                 $this->getAdapter()->quoteIdentifier($this->getTableName() . '.id'),
-                Phprojekt_Module::getId($this->getModelName()), Phprojekt_Auth_Proxy::getEffectiveUserId());
+                Phprojekt_Module::getId($this->moduleName), Phprojekt_Auth_Proxy::getEffectiveUserId());
 
             // Set where
             if (null !== $where) {
@@ -369,7 +369,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
             ->where("{$table}.owner_id = :effectiveUser OR (ir.access & :right) = :right")
             ->bind(
                 array(
-                    ':thisModule' => Phprojekt_Module::getId($this->getModelName()),
+                    ':thisModule' => Phprojekt_Module::getId($this->moduleName),
                     ':effectiveUser' => Phprojekt_Auth_Proxy::getEffectiveUserId(),
                     ':right' => Phprojekt_Acl::READ
                 )
@@ -390,7 +390,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
             $userId = Phprojekt_Auth_Proxy::getEffectiveUserId();
         }
 
-        $moduleId = Phprojekt_Module::getId($this->getModelName());
+        $moduleId = Phprojekt_Module::getId($this->moduleName);
         return Phprojekt_Right::getRightsForItems($moduleId, $this->projectId, $userId, array($this->id));
     }
 
@@ -401,7 +401,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
         }
 
         $projectId = is_null($projectId) ? $this->projectId : $projectId;
-        $moduleId = Phprojekt_Module::getId($this->getModelName());
+        $moduleId = Phprojekt_Module::getId($this->moduleName);
         $rights   = Phprojekt_Right::getRightsForItems($moduleId, $projectId, $userId, array($this->id));
         if (!isset($rights[$this->id])) {
             return Phprojekt_Acl::NONE;
@@ -417,7 +417,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
      */
     public function getUsersRights()
     {
-        $moduleId = Phprojekt_Module::getId($this->getModelName());
+        $moduleId = Phprojekt_Module::getId($this->moduleName);
         return $this->_rights->getUsersRights($moduleId, $this->id);
     }
 
@@ -432,7 +432,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
      */
     public function saveRights($rights)
     {
-        $this->_rights->saveRights(Phprojekt_Module::getId($this->getModelName()), $this->id, $rights);
+        $this->_rights->saveRights(Phprojekt_Module::getId($this->moduleName), $this->id, $rights);
     }
 
     /**
@@ -445,7 +445,7 @@ abstract class Phprojekt_Item_Abstract extends Phprojekt_ActiveRecord_Abstract i
      */
     public function getUsersWithRights($rights = null, $exact = false) {
         return $this->_rights->getUsersWithRight(
-            Phprojekt_Module::getId($this->getModelName()),
+            Phprojekt_Module::getId($this->moduleName),
             $this->id,
             $rights,
             $exact

@@ -150,7 +150,7 @@ class Phprojekt_Converter_Json
         }
 
         $userId    = (int) Phprojekt_Auth_Proxy::getEffectiveUserId();
-        $moduleId  = Phprojekt_Module::getId($models[0]->getModelName());
+        $moduleId  = Phprojekt_Module::getId($models[0]->moduleName);
         // Okay we got real models and stuff that pretends to be a model
         // so we try to guess if we the model has rights that we can access
         if ($models[0] instanceof Phprojekt_Item_Abstract) {

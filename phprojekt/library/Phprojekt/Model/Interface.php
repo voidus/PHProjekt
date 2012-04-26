@@ -72,4 +72,11 @@ interface Phprojekt_Model_Interface extends Iterator
      * @return boolean True on sucessful save.
      */
     public function save();
+
+    /**
+     * Returns the name of the module that this model belongs to.
+     *
+     * @return String The name
+     */
+    public function getModuleName();
 }

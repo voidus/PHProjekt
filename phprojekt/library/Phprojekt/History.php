@@ -69,7 +69,7 @@ class Phprojekt_History extends Phprojekt_ActiveRecord_Abstract
         foreach ($differences as $fieldName => $difference) {
             $history           = clone($this);
             $history->userId   = Phprojekt_Auth::getUserId();
-            $history->moduleId = Phprojekt_Module::getId($object->getModelName());
+            $history->moduleId = Phprojekt_Module::getId($object->moduleName);
             $history->itemId   = $object->id;
             $history->field    = $fieldName;
             $history->oldValue = $difference['oldValue'];
@@ -173,7 +173,7 @@ class Phprojekt_History extends Phprojekt_ActiveRecord_Abstract
                                    $startDate = null, $endDate = null, $userId = null)
     {
         if (!isset($moduleId)) {
-            $moduleId = Phprojekt_Module::getId($object->getModelName());
+            $moduleId = Phprojekt_Module::getId($object->moduleName);
         }
 
         if (null === $object) {
@@ -256,7 +256,7 @@ class Phprojekt_History extends Phprojekt_ActiveRecord_Abstract
     public function getLastHistoryData($object)
     {
         $result   = array();
-        $moduleId = Phprojekt_Module::getId($object->getModelName());
+        $moduleId = Phprojekt_Module::getId($object->moduleName);
         $itemId   = $object->id;
         $where    = sprintf('module_id = %d AND item_id = %d', (int) $moduleId, (int) $itemId);
 

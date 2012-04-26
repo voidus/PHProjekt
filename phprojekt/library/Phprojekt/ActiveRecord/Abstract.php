@@ -1323,4 +1323,20 @@ abstract class Phprojekt_ActiveRecord_Abstract extends Zend_Db_Table_Abstract
     {
         return empty($this->_storedId);
     }
+
+    /**
+     * Returns the name of the module that this object belongs to.
+     *
+     * @return string The name
+     */
+    public function getModuleName()
+    {
+        $name = get_class($this);
+        $pos  = strpos($name, '_');
+        if ($pos !== false) {
+            $name = substr($name, $pos);
+        }
+
+        return $name;
+    }
 }

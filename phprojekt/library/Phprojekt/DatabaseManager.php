@@ -157,7 +157,7 @@ class Phprojekt_DatabaseManager extends Phprojekt_ActiveRecord_Abstract implemen
     protected function _getModuleName()
     {
         if (null === $this->_moduleName) {
-            $this->_moduleName = $this->getModel()->getModelName();
+            $this->_moduleName = $this->getModel()->moduleName;
         }
 
         return $this->_moduleName;
