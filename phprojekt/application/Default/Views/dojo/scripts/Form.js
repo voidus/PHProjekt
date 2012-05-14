@@ -38,7 +38,7 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
     _url:               null,
     _writePermissions:  true,
     _deletePermissions: false,
-    _accessPermissions: true,
+    _adminPermissions:  true,
     _initData:          [],
     _tagUrl:            null,
     _accessUrl:         null,
@@ -228,7 +228,7 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
                 accessDownloadText: phpr.nls.get('Download'),
                 accessAdminText:    phpr.nls.get('Admin'),
                 accessActionText:   phpr.nls.get('Action'),
-                accessPermissions:  (users.length > 0) ? this._accessPermissions : false,
+                adminPermissions:   (users.length > 0) ? this._adminPermissions : false,
                 users:              users
             }
         });
@@ -248,7 +248,7 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
             }
 
             // Add "add" button for access
-            if (this._accessPermissions && users.length > 0) {
+            if (this._adminPermissions && users.length > 0) {
                 this.addTinyButton('add', accessData.accessAddButton, 'newAccess');
                 this.garbageCollector.addEvent(
                     dojo.connect(dijit.byId("checkAdminAccessAdd"),
@@ -274,7 +274,7 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
         var isCurrentUser = (id == phpr.currentUserId);
         var userId        = isCurrentUser ? currentUser : id;
 
-        var accessPermission = this._accessPermissions &&
+        var accessPermission = this._adminPermissions &&
                                 userId != currentUser &&
                                 userId != 1;
 
@@ -309,7 +309,7 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
                 templateData: {
                     fieldId:  fieldId,
                     checked:  rightName ? 'checked' : '',
-                    hidden:   (isCurrentUser && this._accessPermissions),
+                    hidden:   (isCurrentUser && this._adminPermissions),
                     value:    rightName ? 1 : 0,
                     disabled: (!this._writePermissions) ? 'disabled="disabled"' : ''
                 }
@@ -377,22 +377,22 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
             if (phpr.isGlobalModule(phpr.module)) {
                 this._writePermissions  = true;
                 this._deletePermissions = true;
-                this._accessPermissions = false;
+                this._adminPermissions  = false;
             } else {
                 this._writePermissions  = true;
                 this._deletePermissions = true;
-                this._accessPermissions = true;
+                this._adminPermissions  = true;
             }
         } else {
             if (this.id > 0) {
                 if (phpr.isGlobalModule(phpr.module)) {
                     this._writePermissions  = true;
                     this._deletePermissions = true;
-                    this._accessPermissions = false;
+                    this._adminPermissions  = false;
                 } else {
                     this._writePermissions  = data[0].rights[phpr.currentUserId].write;
                     this._deletePermissions = data[0].rights[phpr.currentUserId]['delete'];
-                    this._accessPermissions = data[0].rights[phpr.currentUserId].admin;
+                    this._adminPermissions  = data[0].rights[phpr.currentUserId].admin;
                 }
             }
         }
@@ -910,7 +910,7 @@ dojo.declare("phpr.Default.Form", phpr.Default.System.Component, {
         var userId = this._accessTab.dataAccessAdd.get('value');
         var data = {
             userId:          userId,
-            disabled:    (!this._accessPermissions) ? 'disabled="disabled"' : '',
+            disabled:    (!this._adminPermissions) ? 'disabled="disabled"' : '',
             userDisplay: this._accessTab.dataAccessAdd.get('displayedValue'),
             currentUser: false
         };

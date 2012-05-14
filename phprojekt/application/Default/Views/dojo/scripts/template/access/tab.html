@@ -31,12 +31,12 @@
                     <label>{{accessAdminText}}</label>
                 </td>
                 <td>
-                    {% if accessPermissions %}
+                    {% if adminPermissions %}
                     <label>{{accessActionText}}</label>
                     {% endif %}
                 </td>
             </tr>
-            {% if accessPermissions %}
+            {% if adminPermissions %}
             <tr>
                 <td>
                     <select dojoAttachPoint="dataAccessAdd" name="dataAccessAdd" dojoType="phpr.FilteringSelect" required="false"
