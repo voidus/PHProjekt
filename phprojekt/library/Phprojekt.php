@@ -412,16 +412,6 @@ class Phprojekt
         // Report all PHP errors
         error_reporting(-1);
 
-        if (!defined('PHPR_CORE_PATH')) {
-            define('PHPR_CORE_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'application');
-        }
-        if (!defined('PHPR_LIBRARY_PATH')) {
-            define('PHPR_LIBRARY_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library');
-        }
-        if (!defined('PHPR_CONFIG_FILE')) {
-            define('PHPR_CONFIG_FILE', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'configuration.php');
-        }
-
         set_include_path('.' . PATH_SEPARATOR
             . PHPR_LIBRARY_PATH . PATH_SEPARATOR
             . get_include_path());

@@ -21,15 +21,15 @@
  * @author    David Soria Parra <david.soria_parra@mayflower.de>
  */
 
-/**
-* Section to use from configuration.php.
- */
-define('PHPR_CONFIG_SECTION', 'production');
+defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
+defined('APPLICATION_ENV')  || define('APPLICATION_ENV', getenv('APPLICATION_ENV') ?: 'production');
 
-/**
- * Root path.
- */
-define('PHPR_ROOT_PATH', realpath(dirname(__FILE__) . '/../'));
+
+defined('PHPR_CONFIG_SECTION') || define('PHPR_CONFIG_SECTION', APPLICATION_ENV);
+defined('PHPR_ROOT_PATH') || define('PHPR_ROOT_PATH', realpath(dirname(__FILE__) . '/../'));
+defined('PHPR_CORE_PATH') || define('PHPR_CORE_PATH', APPLICATION_PATH);
+defined('PHPR_LIBRARY_PATH') || define('PHPR_LIBRARY_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library');
+defined('PHPR_CONFIG_FILE') || define('PHPR_CONFIG_FILE', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'configuration.php');
 
 require_once PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library' . DIRECTORY_SEPARATOR . 'Phprojekt.php';
 
