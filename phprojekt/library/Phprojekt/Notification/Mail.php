@@ -159,8 +159,6 @@ class Phprojekt_Notification_Mail extends Phprojekt_Mail
             $view->endOfLine = $this->getEndOfLine();
         }
 
-        Phprojekt_Loader::loadViewScript();
-
         $body = $view->render('mail' . $this->_bodyMode . '.phtml');
 
         switch ($this->_bodyMode) {

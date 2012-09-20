@@ -427,7 +427,6 @@ class Minutes_IndexController extends IndexController
         $this->view->txtType     = $translate->translate('Type');
         $this->view->txtItem     = $translate->translate('Item');
 
-        Phprojekt_Loader::loadViewScript($this->view);
         return $this->view->render('table.phtml');
     }
 
