@@ -254,29 +254,4 @@ class Phprojekt_Loader extends Zend_Loader
         return self::tryToLoadClass($class, true);
     }
 
-    /**
-     * Add the module path for load customs templates.
-     *
-     * @param Zend_View|null $view View class.
-     *
-     * @return void;
-     */
-    public static function loadViewScript($view = null)
-    {
-        $module = Zend_Controller_Front::getInstance()->getRequest()->getModuleName();
-        if (null === $view) {
-            $view = Phprojekt::getInstance()->getView();
-        }
-
-        // Try the system module
-        $path = PHPR_CORE_PATH . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR
-            . 'Views' . DIRECTORY_SEPARATOR . 'dojo' . DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            // Try the user module
-            $path = PHPR_USER_CORE_PATH . $module . DIRECTORY_SEPARATOR
-            . 'Views' . DIRECTORY_SEPARATOR . 'dojo' . DIRECTORY_SEPARATOR;
-        }
-
-        $view->addScriptPath($path);
-    }
 }
