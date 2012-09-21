@@ -409,9 +409,6 @@ class Phprojekt
      */
     public function _initialize()
     {
-        // Report all PHP errors
-        error_reporting(-1);
-
         set_include_path('.' . PATH_SEPARATOR
             . PHPR_LIBRARY_PATH . PATH_SEPARATOR
             . get_include_path());
