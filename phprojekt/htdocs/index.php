@@ -24,6 +24,9 @@
 defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
 defined('APPLICATION_ENV')  || define('APPLICATION_ENV', getenv('APPLICATION_ENV') ?: 'production');
 
+if ('production' !== APPLICATION_ENV) {
+    error_reporting(-1);
+}
 
 defined('PHPR_CONFIG_SECTION') || define('PHPR_CONFIG_SECTION', APPLICATION_ENV);
 defined('PHPR_ROOT_PATH') || define('PHPR_ROOT_PATH', realpath(dirname(__FILE__) . '/../'));
