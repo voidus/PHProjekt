@@ -136,7 +136,8 @@ class Phprojekt_Notification_Mail extends Phprojekt_Mail
     public function setCustomBody($params, $fields, $changes, $lang)
     {
         $phproject        = Phprojekt::getInstance();
-        $view             = $phproject->getView();
+        $view             = new Zend_View();
+        $view->addScriptPath(PHPR_CORE_PATH . '/Default/Views/dojo/');
         $view->mainFields = $fields;
 
         if ($changes !== null) {
