@@ -115,8 +115,10 @@ class Phprojekt
     public static function getVersion()
     {
         if (null !== self::VERSION_EXTRA) {
-            return sprintf("%d.%d.%d-%s", self::VERSION_MAJOR, self::VERSION_MINOR, self::VERSION_RELEASE,
-                self::VERSION_EXTRA);
+            return sprintf(
+                "%d.%d.%d-%s", self::VERSION_MAJOR, self::VERSION_MINOR, self::VERSION_RELEASE,
+                self::VERSION_EXTRA
+            );
         } else {
             return sprintf("%d.%d.%d", self::VERSION_MAJOR, self::VERSION_MINOR, self::VERSION_RELEASE);
         }
@@ -130,7 +132,8 @@ class Phprojekt
      *
      * @return integer
      */
-    public static function getApiVersion() {
+    public static function getApiVersion()
+    {
         return self::API_VERSION;
     }
 
@@ -801,8 +804,13 @@ class Phprojekt
 
         // Write into the error log
         if ($useLog) {
-            $messageLog = sprintf("%s\n File: %s - Line: %d\n Description: %s\n", $errDesc, $errFile, $errLine,
-                $errStr);
+            $messageLog = sprintf(
+                "%s\n File: %s - Line: %d\n Description: %s\n",
+                $errDesc,
+                $errFile,
+                $errLine,
+                $errStr
+            );
 
             if (self::getInstance()->getConfig()->log->printStackTraces) {
                 // The frames always contain the file and line where the function was called To get a format like
