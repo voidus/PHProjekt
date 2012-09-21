@@ -709,7 +709,16 @@ class Setup_Models_Setup
     {
         $databaseNamespace = new Zend_Session_Namespace('databaseData');
         $config            = new Setup_Models_Config();
-        $content           = $config->getDefaultProduction(
+        $content           = $config->getDefaultProduction();
+
+        $baseDir    = $this->getBaseDir();
+        $configFile = $baseDir . "configuration.php";
+        file_put_contents($configFile, $content);
+    }
+
+    public function writeDbIni()
+    {
+        $content = $config->getDbIniContent(
             $databaseNamespace->data['dbUser'],
             $databaseNamespace->data['dbPass'],
             $databaseNamespace->data['dbName'],
@@ -718,9 +727,8 @@ class Setup_Models_Setup
             $databaseNamespace->data['dbPort']
         );
 
-        $baseDir    = $this->getBaseDir();
-        $configFile = $baseDir . "configuration.php";
-        file_put_contents($configFile, $content);
+        $filename = $this->getBaseDir() . 'application/configs/db.ini';
+        file_put_contents($filename, $content);
     }
 
     private function _checkPrivateDirRights()

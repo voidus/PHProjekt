@@ -3,5 +3,6 @@ build
 .project
 .settings/*
 phprojekt/configuration.php
+phprojekt/application/configs/db.ini
 phprojekt/htdocs/dojo/release/dojo/dojo/build.txt
 coverage

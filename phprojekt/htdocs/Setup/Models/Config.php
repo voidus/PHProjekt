@@ -87,6 +87,19 @@ class Setup_Models_Config
         $this->_setPrivateDir();
     }
 
+    public function getDbIniContent($username, $password, $dbname, $adapter, $host, $port)
+    {
+        return <<<HERE
+resources.db.adapter = $adapter
+resources.db.params.host = $host
+resources.db.params.username = $username
+resources.db.params.password = $password
+resources.db.params.dbname = $dbname
+resources.db.params.port = $port
+resources.db.isDefaultTableAdapter = true
+HERE;
+    }
+
     /**
      * Return a default configuration.
      *
@@ -98,13 +111,12 @@ class Setup_Models_Config
      *
      * @return string Output for save in the file.
      */
-    public function getDefaultProduction($username, $password, $dbname, $adapter, $host, $port)
+    public function getDefaultProduction()
     {
         $content = $this->_getIntroduction();
         $content .= $this->_eol . '[production]' . $this->_eol;
         $content .= $this->_getLanguage();
         $content .= $this->_getPaths();
-        $content .= $this->_getDatabase($username, $password, $dbname, $adapter, $host, $port);
         $content .= $this->_getLogs();
         $content .= $this->_getModules();
         $content .= $this->_getMail();
