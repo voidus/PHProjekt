@@ -28,9 +28,6 @@ class PHProjekt_Extensions {
     const CACHE_NS = 'Phprojekt_Extensions';
 
     private $_extensions = null;
-    private $_log        = null;
-    private $_config     = null;
-    private $_cache      = null;
     private $_path       = null;
 
     /**
@@ -41,9 +38,6 @@ class PHProjekt_Extensions {
      * @param string $path The directory to search for extensions.
      */
     public function __construct($path) {
-        $this->_log     = Phprojekt::getInstance()->getLog();
-        $this->_config  = Phprojekt::getInstance()->getConfig();
-        $this->_cache   = Phprojekt::getInstance()->getCache();
         $this->_path    = $path;
         $this->_cacheNs = self::CACHE_NS . md5($this->_path);
     }
@@ -80,10 +74,11 @@ class PHProjekt_Extensions {
             return $this->_extensions;
         }
 
-        if (isset($this->_config->useCacheForExtensions)
-            && true == $this->_config->useCacheForExtensions) {
+        $config = Phprojekt::getInstance()->getConfig();
+        if (isset($config->useCacheForExtensions)
+            && true == $config->useCacheForExtensions) {
             /* we want to have cached extensions */
-            $data = $this->_cache->load($this->_cacheNs);
+            $data = Phprojekt::getInstance()->getCache()->load($this->_cacheNs);
             if (false === $data) { /* cached */
                 $data = $this->updateExtensionsCache($this->_path);
             }
@@ -103,9 +98,9 @@ class PHProjekt_Extensions {
      * @return array
      */
     public function updateExtensionsCache() {
-        $this->_log->debug('update extension cache');
+        Phprojekt::getInstance()->getLog()->debug('update extension cache');
         $extensions = $this->readExtensions($this->_path);
-        if (false === $this->_cache->save($extensions, $this->_cacheNs)) {
+        if (false === Phprojekt::getInstance()->getCache()->save($extensions, $this->_cacheNs)) {
             return false;
         }
 
@@ -145,12 +140,14 @@ class PHProjekt_Extensions {
                         && $this->verifyExtension($obj)) {
                         $extensions[strtolower($module)] = $obj;
                     } else {
-                        $this->_log->warn("Class " . $classname
-                            . " ignored. Not a PHProjekt extension.");
+                        Phprojekt::getInstance()->getLog()->warn(
+                            "Class " . $classname . " ignored. Not a PHProjekt extension."
+                        );
                     }
                 } else {
-                    $this->_log->warn("Class " . $classname
-                        . " not found in " . $filename);
+                    Phprojekt::getInstance()->getLog()->warn(
+                        "Class " . $classname . " not found in " . $filename
+                    );
                 }
 
             }
@@ -167,7 +164,7 @@ class PHProjekt_Extensions {
      */
     private function verifyExtension($extensionObject) {
         if (!preg_match('/^[0-9]\.[0-9]{1,2}\.[0-9]{1,2}$/', $extensionObject->getVersion())) {
-            $this->_log->warn("Extension " . get_class($extensionObject) . " not verified");
+            Phprojekt::getInstance()->getLog()->warn("Extension " . get_class($extensionObject) . " not verified");
             return false;
         }
 
