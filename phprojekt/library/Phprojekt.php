@@ -66,13 +66,6 @@ class Phprojekt
     protected static $_instance = null;
 
     /**
-     * Config class.
-     *
-     * @var Zend_Config_Ini
-     */
-    protected $_config;
-
-    /**
      * Db class.
      *
      * @var Zend_Db
@@ -92,13 +85,6 @@ class Phprojekt
      * @var Zend_Cache
      */
     protected $_cache;
-
-    /**
-     * View class.
-     *
-     * @var Zend_View
-     */
-    protected $_view;
 
     /**
      * Array of blocked Modules.
@@ -192,18 +178,11 @@ class Phprojekt
     }
 
     /**
-     * Return this class only one time.
-     *
-     * @return Phprojekt An instance of Phprojekt.
+     * Provided for backwards compatibility.
      */
     public static function getInstance()
     {
-        if (null === self::$_instance) {
-            self::$_instance = new self();
-            self::$_instance->_initialize();
-        }
-
-        return self::$_instance;
+        return new self();
     }
 
     /**
@@ -213,7 +192,7 @@ class Phprojekt
      */
     public function getConfig()
     {
-        return $this->_config;
+        return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('phprojektConfig');
     }
 
     /**
@@ -225,16 +204,7 @@ class Phprojekt
      */
     public function getDb()
     {
-        if (null === $this->_db) {
-            try {
-                $this->_db = Zend_Db::factory($this->_config->database);
-            } catch (Zend_Db_Adapter_Exception $error) {
-                error_log($error->getMessage());
-                $this->_dieWithInternalServerError();
-            }
-        }
-
-        return $this->_db;
+        return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('db');
     }
 
     /**
@@ -246,16 +216,7 @@ class Phprojekt
      */
     public function getLog()
     {
-        if (null === $this->_log) {
-            try {
-                $this->_log = new Phprojekt_Log($this->_config);
-            } catch (Zend_Log_Exception $error) {
-                error_log($error->getMessage());
-                $this->_dieWithInternalServerError();
-            }
-        }
-
-        return $this->_log;
+        return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('log');
     }
 
     /**
@@ -386,23 +347,13 @@ class Phprojekt
     }
 
     /**
-     * Return the View class.
-     *
-     * @return Zend_View An instance of Zend_View.
-     */
-    public function getView()
-    {
-        return $this->_view;
-    }
-
-    /**
      * Return the Cache class.
      *
      * @return Zend_Cache An instance of Zend_Cache.
      */
     public function getCache()
     {
-        return $this->_cache;
+        return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getResource('phprojektCache');
     }
 
     /**
@@ -412,72 +363,6 @@ class Phprojekt
      */
     public function _initialize()
     {
-        set_include_path('.' . PATH_SEPARATOR
-            . PHPR_LIBRARY_PATH . PATH_SEPARATOR
-            . get_include_path());
-
-        require_once 'Zend/Loader/Autoloader.php';
-        require_once 'Phprojekt/Loader.php';
-
-        $autoloader = Zend_Loader_Autoloader::getInstance();
-        $autoloader->pushAutoloader(array('Phprojekt_Loader', 'autoload'));
-
-        // Read the config file, but only the production setting
-        try {
-            $this->_config = new Zend_Config_Ini(PHPR_CONFIG_FILE, PHPR_CONFIG_SECTION, true);
-        } catch (Zend_Config_Exception $error) {
-            error_log('There is an error in your configuration.php: ' . $error->getMessage());
-            $this->_dieWithInternalServerError();
-        }
-
-        if (empty($this->_config->webpath)) {
-            $response               = new Zend_Controller_Request_Http();
-            $this->_config->webpath = $response->getScheme() . '://' . $response->getHttpHost()
-                . $response->getBasePath() . '/';
-        }
-        if (!defined('PHPR_TEMP_PATH')) {
-            define('PHPR_TEMP_PATH', $this->_config->tmpPath);
-        }
-        if (!defined('PHPR_USER_CORE_PATH')) {
-            define('PHPR_USER_CORE_PATH', $this->_config->applicationPath);
-        }
-
-        set_include_path('.' . PATH_SEPARATOR
-            . PHPR_LIBRARY_PATH . PATH_SEPARATOR
-            . PHPR_CORE_PATH . PATH_SEPARATOR
-            . PHPR_USER_CORE_PATH . PATH_SEPARATOR
-            . get_include_path());
-
-        // Set the timezone to UTC
-        date_default_timezone_set('UTC');
-
-        // Start zend session to handle all session stuff
-        try {
-            Zend_Session::start();
-        } catch (Zend_Session_Exception $error) {
-            Zend_Session::writeClose();
-            Zend_Session::start();
-            Zend_Session::regenerateId();
-            error_log($error);
-        }
-
-        // Set a metadata cache and clean it
-        $frontendOptions = array('automatic_serialization' => true);
-        $backendOptions  = array('cache_dir' => PHPR_TEMP_PATH . 'zendCache' . DIRECTORY_SEPARATOR);
-        try {
-            $this->_cache = Zend_Cache::factory('Core', 'File', $frontendOptions, $backendOptions);
-        } catch (Exception $error) {
-            error_log("The directory " . PHPR_TEMP_PATH . "zendCache do not exists or not have write access.");
-            $this->_dieWithInternalServerError();
-
-        }
-
-        $this->_setupZendDbTableCache();
-        $this->_setupZendLocaleCache();
-
-        // Check Logs
-        $this->getLog();
-
         // Check the server
         $checkServer = Phprojekt::checkExtensionsAndSettings();
 
@@ -509,189 +394,6 @@ class Phprojekt
             error_log($message);
             $this->_dieWithInternalServerError();
         }
-
-        $helperPaths = $this->_getHelperPaths();
-        $view        = $this->_setView($helperPaths);
-
-        $viewRenderer = new Zend_Controller_Action_Helper_ViewRenderer($view);
-        $viewRenderer->setViewBasePathSpec(':moduleDir/Views');
-        $viewRenderer->setViewScriptPathSpec(':action.:suffix');
-        Zend_Controller_Action_HelperBroker::addHelper($viewRenderer);
-        foreach ($helperPaths as $helperPath) {
-            Zend_Controller_Action_HelperBroker::addPath($helperPath['directory']);
-        }
-
-        $plugin = new Zend_Controller_Plugin_ErrorHandler();
-        $plugin->setErrorHandlerModule('Default');
-        $plugin->setErrorHandlerController('Error');
-        $plugin->setErrorHandlerAction('error');
-
-        $front = Zend_Controller_Front::getInstance();
-        $front->setDispatcher(new Phprojekt_Dispatcher());
-        $front->registerPlugin($plugin);
-        $front->setDefaultModule('Default');
-        $front->setModuleControllerDirectoryName('Controllers');
-        $front->addModuleDirectory(PHPR_CORE_PATH);
-        $front->addModuleDirectory(PHPR_USER_CORE_PATH);
-        $front->getRouter()->addRoute('rest', new Phprojekt_RestRoute($front));
-
-        // Add SubModules directories with controlles
-        $moduleDirectories = $this->_getControllersFolders($helperPaths);
-        foreach ($moduleDirectories as $moduleDirectory) {
-            $front->addModuleDirectory($moduleDirectory);
-        }
-
-        $front->setParam('useDefaultControllerAlways', true);
-
-        // Define general error handler
-        set_error_handler(Array("Phprojekt", "errorHandler"));
-
-        $front->registerPlugin(new Phprojekt_ExtensionsPlugin());
-    }
-
-    /**
-     * Set up a cache for Zend_Db_Table.
-     */
-    private function _setupZendDbTableCache()
-    {
-        $cacheDir = PHPR_TEMP_PATH . 'zendDbTable_cache' . DIRECTORY_SEPARATOR;
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0700);
-        }
-        Zend_Db_Table_Abstract::setDefaultMetadataCache(
-            Zend_Cache::factory(
-                'Core',
-                'File',
-                array('automatic_serialization' => true),
-                array('cache_dir' => $cacheDir)
-            )
-        );
-    }
-
-    /**
-     * Set up a cache for Zend_Locale. See http://jira.opensource.mayflower.de/jira/browse/PHPROJEKT-150
-     */
-    private function _setupZendLocaleCache()
-    {
-        $cacheDir = PHPR_TEMP_PATH . 'zendLocale_cache' . DIRECTORY_SEPARATOR;
-        if (!is_dir($cacheDir)) {
-            mkdir($cacheDir, 0700);
-        }
-        Zend_Locale::setCache(
-            Zend_Cache::factory(
-                'Core',
-                'File',
-                array(),
-                array('cache_dir' => $cacheDir)
-            )
-        );
-    }
-
-    /**
-     * Cache the View Class.
-     *
-     * @param array $helperPaths Array with all the folders with helpers.
-     *
-     * @return Zend_View An instance of Zend_View.
-     */
-    private function _setView($helperPaths)
-    {
-        $viewNamespace = new Zend_Session_Namespace('Phprojekt-_setView');
-        if (!isset($viewNamespace->view)) {
-            $view = new Zend_View();
-            $view->addScriptPath(PHPR_CORE_PATH . '/Default/Views/dojo/');
-            foreach ($helperPaths as $helperPath) {
-                if (is_dir($helperPath['directory'])) {
-                    $view->addHelperPath($helperPath['directory'], $helperPath['module'] . '_' . 'Helpers');
-                }
-            }
-            $viewNamespace->view = $view;
-        } else {
-            $view = $viewNamespace->view;
-        }
-
-        $this->_view = $view;
-
-        return $view;
-    }
-
-    /**
-     * Cache the folders with helpers files.
-     *
-     * @return array Array with 'module', 'path' and 'directory'.
-     */
-    private function _getHelperPaths()
-    {
-        $helperPathNamespace = new Zend_Session_Namespace('Phprojekt-_getHelperPaths');
-        if (!isset($helperPathNamespace->helperPaths)) {
-            $helperPaths = array();
-            // System modules
-            foreach (scandir(PHPR_CORE_PATH) as $module) {
-                $dir = PHPR_CORE_PATH . DIRECTORY_SEPARATOR . $module;
-                if ($module == '.'  || $module == '..' || !is_dir($dir)) {
-                    continue;
-                }
-
-                $helperPaths[] = array('module'    => $module,
-                                       'path'      => PHPR_CORE_PATH . DIRECTORY_SEPARATOR,
-                                       'directory' => $dir . DIRECTORY_SEPARATOR . 'Helpers');
-            }
-
-            // User modules
-            foreach (scandir(PHPR_USER_CORE_PATH) as $module) {
-                $dir = PHPR_USER_CORE_PATH . $module;
-                if ($module == '.'  || $module == '..' || !is_dir($dir)) {
-                    continue;
-                }
-
-                $helperPaths[] = array('module'    => $module,
-                                       'path'      => PHPR_USER_CORE_PATH,
-                                       'directory' => $dir . DIRECTORY_SEPARATOR . 'Helpers');
-            }
-
-            $helperPathNamespace->helperPaths = $helperPaths;
-        } else {
-            $helperPaths = $helperPathNamespace->helperPaths;
-        }
-
-        return $helperPaths;
-    }
-
-
-    /**
-     * Cache the SubModules folders with controllers files.
-     *
-     * @param array $helperPaths Array with all the folders with helpers.
-     *
-     * @return array Array with directories.
-     */
-    private function _getControllersFolders($helperPaths)
-    {
-        $controllerPathNamespace = new Zend_Session_Namespace('Phprojekt-_getControllersFolders');
-        if (!isset($controllerPathNamespace->controllerPaths)) {
-            $controllerPaths = array();
-            foreach ($helperPaths as $helperPath) {
-                $dir = $helperPath['path'] . $helperPath['module'] . DIRECTORY_SEPARATOR . 'SubModules';
-                if (is_dir($dir)) {
-                    if ($helperPath['module'] != 'Core') {
-                        $controllerPaths[] = $dir;
-                    } else {
-                        $coreModules = scandir($dir);
-                        foreach ($coreModules as $coreModule) {
-                            $coreDir = $dir . DIRECTORY_SEPARATOR . $coreModule;
-                            if ($coreModule != '.'  && $coreModule != '..' && is_dir($coreDir)) {
-                                $controllerPaths[] = $coreDir;
-                            }
-                        }
-                    }
-                }
-            }
-            $controllerPathNamespace->controllerPaths = $controllerPaths;
-        } else {
-            $controllerPaths = $controllerPathNamespace->controllerPaths;
-        }
-
-        return $controllerPaths;
     }
 
     /**
@@ -704,22 +406,6 @@ class Phprojekt
         // Remove SubModules entries
         $controllerPathNamespace = new Zend_Session_Namespace('Phprojekt-_getControllersFolders');
         $controllerPathNamespace->unsetAll();
-    }
-
-    /**
-     * Run the dispatch.
-     *
-     * @return void
-     */
-    public function run()
-    {
-        try {
-            Zend_Controller_Front::getInstance()->dispatch();
-        } catch (Exception $error) {
-            echo "Caught exception: " . $error->getFile() . ':' . $error->getLine() . "\n";
-            echo '<br/>' . $error->getMessage();
-            echo '<pre>' . $error->getTraceAsString() . '</pre>';
-        }
     }
 
     /**
@@ -805,10 +491,7 @@ class Phprojekt
         // Write into the error log
         if ($useLog) {
             $messageLog = sprintf(
-                "%s\n File: %s - Line: %d\n Description: %s\n",
-                $errDesc,
-                $errFile,
-                $errLine,
+                "%s\n File: %s - Line: %d\n Description: %s\n", $errDesc, $errFile, $errLine,
                 $errStr
             );
 
@@ -1030,15 +713,6 @@ class Phprojekt
         $response = new Zend_Controller_Response_Http();
         $response->setHttpResponseCode(500);
         $response->setBody('Internal Server Error. Please contact an administrator.');
-        $response->sendResponse();
-        die();
-    }
-
-    private function _redirectToSetupAndDie()
-    {
-        $response = new Zend_Controller_Response_Http();
-        $response->setRedirect('setup.php');
-        $response->setBody('No configuration file found, redirecting to setup.');
         $response->sendResponse();
         die();
     }
