@@ -270,12 +270,12 @@ class Phprojekt
     public function getTranslate($locale = null)
     {
         if (null === $locale) {
-            $locale = Phprojekt_Auth::getRealUser()->getSetting("language", $this->_config->language);
+            $locale = Phprojekt_Auth::getRealUser()->getSetting("language", $this->getConfig()->language);
         }
 
-        if (!($translate = $this->_cache->load('Phprojekt_getTranslate_' . $locale))) {
+        if (!($translate = $this->getCache()->load('Phprojekt_getTranslate_' . $locale))) {
             $translate = new Phprojekt_Language(array('locale' => $locale));
-            $this->_cache->save($translate, 'Phprojekt_getTranslate_' . $locale, array('Language'));
+            $this->getCache()->save($translate, 'Phprojekt_getTranslate_' . $locale, array('Language'));
         }
 
         return $translate;
@@ -348,7 +348,7 @@ class Phprojekt
         }
 
         if (null === $locale) {
-            $locale = Phprojekt_Auth::getRealUser()->getSetting("language", $this->_config->language);
+            $locale = Phprojekt_Auth::getRealUser()->getSetting("language", $this->getConfig()->language);
         }
 
         return $translate->translate($message, $moduleName, $locale);
