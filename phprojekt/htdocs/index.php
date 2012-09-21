@@ -34,7 +34,9 @@ defined('PHPR_CORE_PATH') || define('PHPR_CORE_PATH', APPLICATION_PATH);
 defined('PHPR_LIBRARY_PATH') || define('PHPR_LIBRARY_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library');
 defined('PHPR_CONFIG_FILE') || define('PHPR_CONFIG_FILE', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'configuration.php');
 
-require_once PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library' . DIRECTORY_SEPARATOR . 'Phprojekt.php';
+set_include_path(realpath(dirname(__FILE__) . '/../library/') . PATH_SEPARATOR . get_include_path());
+require_once 'Zend/Application.php';
+require_once 'Zend/Config/Ini.php';
 
 if (!file_exists(PHPR_CONFIG_FILE)) {
     $script = $_SERVER['SCRIPT_NAME'];
@@ -44,5 +46,13 @@ if (!file_exists(PHPR_CONFIG_FILE)) {
         echo "Redirecting to <a>$url</a>";
     }
 } else {
-    Phprojekt::getInstance()->run();
+    $config = new Zend_Config_Ini(
+        APPLICATION_PATH . '/configs/application.ini',
+        APPLICATION_ENV,
+        array('allowModifications' => true)
+    );
+    $config->merge(new Zend_Config_Ini(PHPR_ROOT_PATH . '/configuration.php', APPLICATION_ENV));
+
+    $application = new Zend_Application(APPLICATION_ENV, $config);
+    $application->bootstrap()->run();
 }
