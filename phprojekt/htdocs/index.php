@@ -36,4 +36,13 @@ defined('PHPR_CONFIG_FILE') || define('PHPR_CONFIG_FILE', PHPR_ROOT_PATH . DIREC
 
 require_once PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library' . DIRECTORY_SEPARATOR . 'Phprojekt.php';
 
-Phprojekt::getInstance()->run();
+if (!file_exists(PHPR_CONFIG_FILE)) {
+    $script = $_SERVER['SCRIPT_NAME'];
+    $url = "http://". $_SERVER['SERVER_NAME'] . substr($script, 0, strlen($script) - strlen('index.php')) . 'setup.php';
+    header("Location: $url", true, 307); // Moved temporarily
+    if ($_SERVER['REQUEST_METHOD'] !== 'HEAD') {
+        echo "Redirecting to <a>$url</a>";
+    }
+} else {
+    Phprojekt::getInstance()->run();
+}

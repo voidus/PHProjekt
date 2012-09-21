@@ -419,11 +419,6 @@ class Phprojekt
         $autoloader = Zend_Loader_Autoloader::getInstance();
         $autoloader->pushAutoloader(array('Phprojekt_Loader', 'autoload'));
 
-        // If the configuration file does not exist we redirect to the setup page.
-        if (!file_exists(PHPR_CONFIG_FILE)) {
-            $this->_redirectToSetupAndDie();
-        }
-
         // Read the config file, but only the production setting
         try {
             $this->_config = new Zend_Config_Ini(PHPR_CONFIG_FILE, PHPR_CONFIG_SECTION, true);
