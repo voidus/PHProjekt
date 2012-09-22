@@ -188,7 +188,7 @@ class Phprojekt_Module_Module extends Phprojekt_ActiveRecord_Abstract implements
         }
 
         // Delete Files
-        $this->_deleteFolder(PHPR_USER_CORE_PATH . $this->name);
+        $this->_deleteFolder(PHPR_USER_CORE_PATH . '/' . $this->name);
 
         // Delete module entry
         parent::delete();
@@ -224,7 +224,7 @@ class Phprojekt_Module_Module extends Phprojekt_ActiveRecord_Abstract implements
      */
     private function _makeFolder($pathToFolder)
     {
-        $folderPath = PHPR_USER_CORE_PATH . $this->name;
+        $folderPath = PHPR_USER_CORE_PATH . '/' . $this->name;
         if (!is_dir($folderPath)) {
             if (mkdir($folderPath, 0770)) {
                 chmod($folderPath, 0775);
@@ -285,7 +285,7 @@ class Phprojekt_Module_Module extends Phprojekt_ActiveRecord_Abstract implements
                         $file = $this->name . '.php';
                     }
 
-                    $modulePath = PHPR_USER_CORE_PATH . $this->name;
+                    $modulePath = PHPR_USER_CORE_PATH . '/' . $this->name;
                     foreach ($paths as $key => $path) {
                         if ($key > 0) {
                             $modulePath .= DIRECTORY_SEPARATOR . $path;
@@ -311,7 +311,7 @@ class Phprojekt_Module_Module extends Phprojekt_ActiveRecord_Abstract implements
     private function _createSqlFile()
     {
         $eol        = "\n";
-        $modulePath = PHPR_USER_CORE_PATH . $this->name . DIRECTORY_SEPARATOR . 'Sql' . DIRECTORY_SEPARATOR . 'Db.json';
+        $modulePath = PHPR_USER_CORE_PATH . '/' . $this->name . '/Sql/Db.json';
 
         $content = file_get_contents($modulePath);
 

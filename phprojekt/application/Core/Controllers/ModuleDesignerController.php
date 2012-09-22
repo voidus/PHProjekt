@@ -44,7 +44,7 @@ class Core_ModuleDesignerController extends Core_IndexController
             }
 
             $data['data']['isUserModule'] = false;
-            if (is_dir(PHPR_USER_CORE_PATH . $module)) {
+            if (is_dir(PHPR_USER_CORE_PATH . '/' . $module)) {
                 $data['data']['isUserModule'] = true;
             }
         } else {

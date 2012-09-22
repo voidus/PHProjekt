@@ -90,7 +90,7 @@ class Phprojekt_Setting extends Phprojekt_ActiveRecord_Abstract
 
         // User modules settings
         foreach (scandir(PHPR_USER_CORE_PATH) as $dir) {
-            $path = PHPR_USER_CORE_PATH . $dir;
+            $path = PHPR_USER_CORE_PATH . '/' . $dir;
             if ($dir == '.' || $dir == '..') {
                 continue;
             }

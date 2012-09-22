@@ -95,7 +95,7 @@ final class Default_Helpers_Upload
         }
 
         $adapter = new Zend_File_Transfer_Adapter_Http();
-        $adapter->setDestination($config->uploadPath);
+        $adapter->setDestination(PHPR_UPLOAD_PATH);
 
         if (!$adapter->receive()) {
             $messages = $adapter->getMessages();
@@ -459,7 +459,7 @@ final class Default_Helpers_Upload
      */
     static private function _absoluteFilePathFromHash($hash)
     {
-        return Phprojekt::getInstance()->getConfig()->uploadPath . $hash;
+        return PHPR_UPLOAD_PATH . '/' . $hash;
     }
 
     /**
