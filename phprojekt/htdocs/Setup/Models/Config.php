@@ -318,16 +318,12 @@ class Setup_Models_Config
      *
      * @return string Output for save in the file.
      */
-    private function _getModules($userDisplayFormat = 0, $itemsPerPage = 3)
+    private function _getModules($userDisplayFormat = 0)
     {
         $content  = $this->_eol;
         $content .= ';;;;;;;;;;;' . $this->_eol;
         $content .= '; MODULES ;' . $this->_eol;
         $content .= ';;;;;;;;;;;' . $this->_eol;
-        $content .= $this->_eol;
-
-        $content .= '; Not used at the moment, leave it as it is.' . $this->_eol;
-        $content .= 'itemsPerPage = ' . (int) $itemsPerPage . $this->_eol;
         $content .= $this->_eol;
 
         $content .= '; Users' . $this->_eol;

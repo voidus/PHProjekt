@@ -103,9 +103,6 @@ log.printStackTraces = false
 ; MODULES ;
 ;;;;;;;;;;;
 
-; Not used at the moment, leave it as it is.
-itemsPerPage = 3
-
 ; Users
 ; How the users are displayed in the system
 ; 0 = lastname, firstname
