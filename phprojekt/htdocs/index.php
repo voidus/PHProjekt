@@ -20,8 +20,9 @@
  * @version   Release: 6.1.0
  * @author    David Soria Parra <david.soria_parra@mayflower.de>
  */
+defined('PHPR_ROOT_PATH') || define('PHPR_ROOT_PATH', realpath(dirname(__FILE__) . '/../'));
 
-defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(dirname(__FILE__) . '/../application'));
+defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(PHPR_ROOT_PATH . '/application'));
 defined('APPLICATION_ENV')  || define('APPLICATION_ENV', getenv('APPLICATION_ENV') ?: 'production');
 
 if ('production' !== APPLICATION_ENV) {
@@ -29,12 +30,11 @@ if ('production' !== APPLICATION_ENV) {
 }
 
 defined('PHPR_CONFIG_SECTION') || define('PHPR_CONFIG_SECTION', APPLICATION_ENV);
-defined('PHPR_ROOT_PATH') || define('PHPR_ROOT_PATH', realpath(dirname(__FILE__) . '/../'));
 defined('PHPR_CORE_PATH') || define('PHPR_CORE_PATH', APPLICATION_PATH);
 defined('PHPR_LIBRARY_PATH') || define('PHPR_LIBRARY_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library');
 defined('PHPR_CONFIG_FILE') || define('PHPR_CONFIG_FILE', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'configuration.php');
 
-set_include_path(realpath(dirname(__FILE__) . '/../library/') . PATH_SEPARATOR . get_include_path());
+set_include_path(realpath(PHPR_ROOT_PATH . '/library/') . PATH_SEPARATOR . get_include_path());
 require_once 'Zend/Application.php';
 require_once 'Zend/Config/Ini.php';
 
