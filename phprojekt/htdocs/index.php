@@ -29,7 +29,6 @@ if ('production' !== APPLICATION_ENV) {
     error_reporting(-1);
 }
 
-defined('PHPR_CONFIG_SECTION') || define('PHPR_CONFIG_SECTION', APPLICATION_ENV);
 defined('PHPR_CORE_PATH') || define('PHPR_CORE_PATH', APPLICATION_PATH);
 defined('PHPR_LIBRARY_PATH') || define('PHPR_LIBRARY_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library');
 defined('PHPR_CONFIG_FILE') || define('PHPR_CONFIG_FILE', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'configuration.php');

@@ -25,11 +25,6 @@
 /**
  * @ignore
  */
-define('PHPR_CONFIG_SECTION', 'production');
-
-/**
- * @ignore
- */
 define('PHPR_ROOT_PATH', realpath(dirname(__FILE__) . '/../'));
 define('PHPR_CORE_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'htdocs');
 define('PHPR_USER_CORE_PATH', PHPR_CORE_PATH);

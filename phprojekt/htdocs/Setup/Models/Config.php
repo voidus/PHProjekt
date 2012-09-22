@@ -187,12 +187,6 @@ HERE;
         $content .= '; The semicolons \';\' are used preceding a comment line, or a line which has data' . $this->_eol;
         $content .= '; that is not being used.' . $this->_eol;
         $content .= $this->_eol;
-        $content .= '; This file is divided into sections,' . $this->_eol;
-        $content .= '; Each one of them corresponds to one' . $this->_eol;
-        $content .= '; environment, it is used only one at a time, depending on what is speficied in' . $this->_eol;
-        $content .= '; index.php, inside folder \'htdocs\' in the line that has:' . $this->_eol;
-        $content .= '; define(\'PHPR_CONFIG_SECTION\', \'production\');' . $this->_eol;
-        $content .= $this->_eol;
         $content .= '; You could leave that line as it is, and in configuration.php just modify the' . $this->_eol;
         $content .= '; parameters inside [production] section. You can also add your own sections.' . $this->_eol;
 

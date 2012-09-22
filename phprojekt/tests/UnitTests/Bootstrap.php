@@ -6,7 +6,6 @@ defined('PHPR_ROOT_PATH') || define('PHPR_ROOT_PATH', realpath(dirname(__FILE__)
 defined('APPLICATION_PATH') || define('APPLICATION_PATH', realpath(PHPR_ROOT_PATH . '/application'));
 defined('APPLICATION_ENV')  || define('APPLICATION_ENV', getenv('APPLICATION_ENV') ?: 'testing');
 
-defined('PHPR_CONFIG_SECTION') || define('PHPR_CONFIG_SECTION', APPLICATION_ENV);
 defined('PHPR_CORE_PATH') || define('PHPR_CORE_PATH', APPLICATION_PATH);
 defined('PHPR_LIBRARY_PATH') || define('PHPR_LIBRARY_PATH', PHPR_ROOT_PATH . DIRECTORY_SEPARATOR . 'library');
 defined('PHPR_CONFIG_FILE') || define('PHPR_CONFIG_FILE', getenv('P6_TEST_CONFIG') ?: 'configuration.php');

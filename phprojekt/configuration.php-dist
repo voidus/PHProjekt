@@ -7,12 +7,6 @@
 ; The semicolons ';' are used preceding a comment line, or a line which has data
 ; that is not being used.
 
-; This file is divided into 2 sections: [production], and [test-other-config],
-; both has the same options. Each one of them corresponds to one
-; environment, it is used only one at a time, depending on what is speficied in
-; index.php, inside folder 'htdocs' in the line that has:
-; define('PHPR_CONFIG_SECTION', 'production');
-
 ; You could leave that line as it is, and in configuration.php just modify the
 ; parameters inside [production] section. You can also add your own sections.
 
