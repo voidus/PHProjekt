@@ -73,7 +73,7 @@ final class Default_Helpers_Upload
         self::_checkParamField($model, $field);
         self::_checkWritePermission($model, $itemId);
 
-        $config     = Phprojekt::getInstance()->getConfig();
+        $config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption('phprojekt');
 
         $files = self::_getSessionFiles($field);
 

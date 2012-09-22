@@ -7,7 +7,6 @@ uploadPath         = "/home/dsp/phprojekt_private/tests/private_folder/upload/"
 log.debug.filename = "/home/dsp/phprojekt_private/tests/private_folder/logs/debug.log"
 
 userDisplayFormat    = 0
-maxUploadSize        = 512000
 
 ;;;;;;;;
 ; MAIL ;

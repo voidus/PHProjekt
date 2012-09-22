@@ -1223,6 +1223,8 @@ class IndexController extends Zend_Controller_Action
             }
         }
 
+        $config = Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption('phprojekt');
+
         $this->view->compressedDojo = (bool) $config->compressedDojo;
         $this->view->formPath       = $linkBegin . 'fileUpload/' . $linkData;
         $this->view->downloadLink   = '';

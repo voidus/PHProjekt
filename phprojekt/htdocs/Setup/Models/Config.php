@@ -344,12 +344,6 @@ HERE;
         $content .= '; File containing words that should not be indexed in the search' . $this->_eol;
         $content .= 'searchStopwordList = ""' . $this->_eol;
 
-        $content .= $this->_eol;
-        $content .= '; Max size in bytes that is allowed to be uploaded per file.' . $this->_eol;
-        $content .= '; 1 kb = 1024    bytes.' . $this->_eol;
-        $content .= '; 1 Mb = 1048576 bytes.' . $this->_eol;
-        $content .= 'maxUploadSize = ' . Phprojekt::DEFAULT_MAX_UPLOAD_SIZE . $this->_eol;
-
         return $content;
     }
 
