@@ -24,7 +24,6 @@ applicationPath    = "/home/dsp/phprojekt_private/tests/private_folder/applicati
 uploadPath         = "/home/dsp/phprojekt_private/tests/private_folder/upload/"
 log.debug.filename = "/home/dsp/phprojekt_private/tests/private_folder/logs/debug.log"
 
-itemsPerPage         = 3;
 userDisplayFormat    = 0
 maxUploadSize        = 512000
 
