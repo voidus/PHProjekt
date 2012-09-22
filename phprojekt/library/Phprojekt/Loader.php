@@ -66,8 +66,8 @@ class Phprojekt_Loader extends Zend_Loader
 
             if (self::isReadable(PHPR_CORE_PATH . DIRECTORY_SEPARATOR . $path)) {
                 self::_includeFile(PHPR_CORE_PATH . DIRECTORY_SEPARATOR . $path, true);
-            } else if (self::isReadable(PHPR_USER_CORE_PATH . $path)) {
-                self::_includeFile(PHPR_USER_CORE_PATH . $path, true);
+            } else if (self::isReadable(PHPR_USER_CORE_PATH . '/' . $path)) {
+                self::_includeFile(PHPR_USER_CORE_PATH . '/' . $path, true);
             }
         }
 
@@ -221,7 +221,7 @@ class Phprojekt_Loader extends Zend_Loader
 
         if (!$isLibraryClass) {
             if ($isUserModule) {
-                $file = substr(PHPR_USER_CORE_PATH, 0, strlen(PHPR_USER_CORE_PATH) -1);
+                $file = PHPR_USER_CORE_PATH;
             } else {
                 $file = PHPR_CORE_PATH;
             }

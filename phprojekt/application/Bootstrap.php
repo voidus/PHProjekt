@@ -29,11 +29,19 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
                 . $response->getBasePath() . '/';
         }
 
-        defined('PHPR_TEMP_PATH') || define('PHPR_TEMP_PATH', $config->tmpPath);
-        defined('PHPR_USER_CORE_PATH') || define('PHPR_USER_CORE_PATH', $config->applicationPath);
-        set_include_path(PHPR_USER_CORE_PATH . PATH_SEPARATOR . get_include_path());
-
         return $config;
+    }
+
+    protected function _initPrivateDirPaths()
+    {
+        $this->bootstrap('phprojektConfig');
+
+        $config = $this->getResource('phprojektConfig');
+        defined('PHPR_TEMP_PATH') || define('PHPR_TEMP_PATH', realpath($config->tmpPath));
+        defined('PHPR_UPLOAD_PATH') || define('PHPR_UPLOAD_PATH', realpath($config->uploadPath));
+        defined('PHPR_WEBDAV_PATH') || define('PHPR_WEBDAV_PATH', realpath($config->webdavPath));
+        defined('PHPR_USER_CORE_PATH') || define('PHPR_USER_CORE_PATH', realpath($config->applicationPath));
+        set_include_path(PHPR_USER_CORE_PATH . PATH_SEPARATOR . get_include_path());
     }
 
     protected function _initLog()
@@ -93,7 +101,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
             // User modules
             foreach (scandir(PHPR_USER_CORE_PATH) as $module) {
-                $dir = PHPR_USER_CORE_PATH . $module;
+                $dir = PHPR_USER_CORE_PATH . '/' . $module;
                 if ($module == '.'  || $module == '..' || !is_dir($dir)) {
                     continue;
                 }
@@ -197,8 +205,9 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     protected function _initPhprojektCache()
     {
+        $this->bootstrap('privateDirPaths');
         $frontendOptions = array('automatic_serialization' => true);
-        $backendOptions  = array('cache_dir' => PHPR_TEMP_PATH . 'zendCache' . DIRECTORY_SEPARATOR);
+        $backendOptions  = array('cache_dir' => PHPR_TEMP_PATH . '/zendCache');
         $cache           = Zend_Cache::factory('Core', 'File', $frontendOptions, $backendOptions);
 
         $this->_setupZendDbTableCache();
@@ -209,7 +218,8 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     private function _setupZendDbTableCache()
     {
-        $cacheDir = PHPR_TEMP_PATH . 'zendDbTable_cache' . DIRECTORY_SEPARATOR;
+        $this->bootstrap('privateDirPaths');
+        $cacheDir = PHPR_TEMP_PATH . '/zendDbTable_cache';
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0700);
         }
@@ -228,7 +238,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
      */
     private function _setupZendLocaleCache()
     {
-        $cacheDir = PHPR_TEMP_PATH . 'zendLocale_cache' . DIRECTORY_SEPARATOR;
+        $cacheDir = PHPR_TEMP_PATH . '/zendLocale_cache';
         if (!is_dir($cacheDir)) {
             mkdir($cacheDir, 0700);
         }

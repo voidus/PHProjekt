@@ -102,7 +102,7 @@ abstract class FrontInit extends DatabaseTest
 
         // User modules
         foreach (scandir(PHPR_USER_CORE_PATH) as $module) {
-            $dir = PHPR_USER_CORE_PATH . $module;
+            $dir = PHPR_USER_CORE_PATH . '/' . $module;
 
             if (is_dir(!$dir)) {
                 continue;
@@ -115,7 +115,7 @@ abstract class FrontInit extends DatabaseTest
                 Zend_Controller_Action_HelperBroker::addPath($helperPath);
             }
 
-            $dir = PHPR_USER_CORE_PATH . $module . DIRECTORY_SEPARATOR . 'SubModules';
+            $dir = PHPR_USER_CORE_PATH . '/' . $module . '/SubModules';
             if (is_dir($dir)) {
                 $moduleDirectories[] = $dir;
             }

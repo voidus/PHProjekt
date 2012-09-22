@@ -38,7 +38,6 @@ class WebDAV_IndexController extends IndexController
     public function indexAction()
     {
         // Set the root directory
-        $webdavPath    = Phprojekt::getInstance()->getConfig()->webdavPath;
         if (Phprojekt_Auth::isLoggedIn()) {
             $project       = new Project_Models_Project();
             $project       = $project->find(1);
@@ -54,7 +53,7 @@ class WebDAV_IndexController extends IndexController
 
         // The lock manager is reponsible for making sure users don't overwrite each others changes.
         // Change 'data' to a different directory, if you're storing your data somewhere else.
-        $lockBackend = new Sabre_DAV_Locks_Backend_File($webdavPath . 'data/locks');
+        $lockBackend = new Sabre_DAV_Locks_Backend_File(PHPR_WEBDAV_PATH . '/data/locks');
         $lockPlugin  = new Sabre_DAV_Locks_Plugin($lockBackend);
         $server->addPlugin($lockPlugin);
 

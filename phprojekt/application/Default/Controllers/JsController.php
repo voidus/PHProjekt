@@ -142,8 +142,8 @@ class JsController extends IndexController
         $module = ucfirst(str_replace(" ", "", $module));
 
         // Load the module
-        if (is_dir(PHPR_USER_CORE_PATH . $module . '/Views/dojo/scripts/')) {
-            $scripts = scandir(PHPR_USER_CORE_PATH . $module . '/Views/dojo/scripts/');
+        if (is_dir(PHPR_USER_CORE_PATH . '/' . $module . '/Views/dojo/scripts/')) {
+            $scripts = scandir(PHPR_USER_CORE_PATH . '/' . $module . '/Views/dojo/scripts/');
         } else {
             $scripts = array();
         }
