@@ -3,12 +3,12 @@ php:
     - 5.3
     - 5.4
 env:
-    - P6_TEST_CONFIG=configuration-travis.php
+    - P6_TEST_CONFIG=configuration-travis.php APPLICATION_ENV=testing-travis
 before_script:
     - pyrus channel-discover pear.symfony.com
     - pyrus install --force phpunit/DbUnit
     - phpenv rehash
-    - mysql -u root -e 'create database `phprojekt-test-memory`'
-    - mysql -u root phprojekt-test-memory < phprojekt/tests/test_database_memory.sql
+    - mysql -u root -e 'create database `phprojekt_test`'
+    - mysql -u root phprojekt_test < phprojekt/tests/test_database_memory.sql
 script:
     - phpunit -c phpunit-travis.xml
