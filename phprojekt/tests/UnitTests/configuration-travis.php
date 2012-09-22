@@ -17,8 +17,6 @@ database.params.password    = "phprojekt"
 
 [general]
 
-applicationDir       = "phprojekt/"
-
 tmpPath            = "phprojekt/tests/private_folder/tmp/"
 applicationPath    = "phprojekt/tests/private_folder/application/"
 uploadPath         = "phprojekt/tests/private_folder/upload/"
