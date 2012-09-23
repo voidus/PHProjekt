@@ -97,6 +97,11 @@ resources.db.params.password = $password
 resources.db.params.dbname = $dbname
 resources.db.params.port = $port
 resources.db.isDefaultTableAdapter = true
+
+phprojekt.uploadPath = {$this->_privateDir}upload
+phprojekt.tmpPath = {$this->_privateDir}tmp
+phprojekt.applicationPath = {$this->_privateDir}application
+phprojekt.webdavPath = {$this->_privateDir}webdav
 HERE;
     }
 
@@ -116,7 +121,6 @@ HERE;
         $content = $this->_getIntroduction();
         $content .= $this->_eol . '[production]' . $this->_eol;
         $content .= $this->_getLanguage();
-        $content .= $this->_getPaths();
         $content .= $this->_getLogs();
         $content .= $this->_getModules();
         $content .= $this->_getMail();
@@ -212,37 +216,6 @@ HERE;
         $content .= '; German, "en" for English or "es" for Spanish. Actually, the language for each' . $this->_eol;
         $content .= '; user is specified individually from Administration -> User' . $this->_eol;
         $content .= 'language = "' . $language . '"' . $this->_eol;
-
-        return $content;
-    }
-
-    /**
-     * Return the paths text.
-     *
-     * @return string Output for save in the file.
-     */
-    private function _getPaths()
-    {
-        $content  = $this->_eol;
-        $content .= ';;;;;;;;;' . $this->_eol;
-        $content .= '; PATHS ;' . $this->_eol;
-        $content .= ';;;;;;;;;' . $this->_eol;
-        $content .= $this->_eol;
-
-        $content .= '; Path where will be placed files uploaded by the user.' . $this->_eol;
-        $content .= 'uploadPath = "' . $this->_privateDir . 'upload/"' . $this->_eol;
-
-        $content .= $this->_eol;
-        $content .= '; Path where will be placed temporaly files.' . $this->_eol;
-        $content .= 'tmpPath = "' . $this->_privateDir . 'tmp/"' . $this->_eol;
-
-        $content .= $this->_eol;
-        $content .= '; Path where will be placed modules created by the admin.' . $this->_eol;
-        $content .= 'applicationPath = "' . $this->_privateDir . 'application/"' . $this->_eol;
-
-        $content .= $this->_eol;
-        $content .= '; Path where webdav resides' . $this->_eol;
-        $content .= 'webdavPath = "' . $this->_privateDir . 'webdav/"' . $this->_eol;
 
         return $content;
     }

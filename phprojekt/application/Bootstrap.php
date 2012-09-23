@@ -34,13 +34,11 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     protected function _initPrivateDirPaths()
     {
-        $this->bootstrap('phprojektConfig');
-
-        $config = $this->getResource('phprojektConfig');
-        defined('PHPR_TEMP_PATH') || define('PHPR_TEMP_PATH', realpath($config->tmpPath));
-        defined('PHPR_UPLOAD_PATH') || define('PHPR_UPLOAD_PATH', realpath($config->uploadPath));
-        defined('PHPR_WEBDAV_PATH') || define('PHPR_WEBDAV_PATH', realpath($config->webdavPath));
-        defined('PHPR_USER_CORE_PATH') || define('PHPR_USER_CORE_PATH', realpath($config->applicationPath));
+        $config = $this->getOption('phprojekt');
+        defined('PHPR_TEMP_PATH') || define('PHPR_TEMP_PATH', realpath($config['tmpPath']));
+        defined('PHPR_UPLOAD_PATH') || define('PHPR_UPLOAD_PATH', realpath($config['uploadPath']));
+        defined('PHPR_WEBDAV_PATH') || define('PHPR_WEBDAV_PATH', realpath($config['webdavPath']));
+        defined('PHPR_USER_CORE_PATH') || define('PHPR_USER_CORE_PATH', realpath($config['applicationPath']));
         set_include_path(PHPR_USER_CORE_PATH . PATH_SEPARATOR . get_include_path());
     }
 
