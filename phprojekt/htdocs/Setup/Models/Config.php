@@ -248,46 +248,6 @@ HERE;
     }
 
     /**
-     * Return the database text.
-     *
-     * @param string $username Database username to set.
-     * @param string $password Database password to set.
-     * @param string $dbname   Database table name to set.
-     * @param string $adapter  Database type to set.
-     * @param string $host     Database host to set.
-     *
-     * @return string Output for save in the file.
-     */
-    private function _getDatabase($username = '', $password = '', $dbname = '', $adapter = 'Pdo_Mysql',
-        $host = 'localhost', $port = 3306)
-    {
-        $content  = $this->_eol;
-        $content .= ';;;;;;;;;;;;' . $this->_eol;
-        $content .= '; DATABASE ;' . $this->_eol;
-        $content .= ';;;;;;;;;;;;' . $this->_eol;
-        $content .= $this->_eol;
-
-        $content .= '; For this Developer Release, it just has been tested with pdo_mysql.' . $this->_eol;
-        $content .= 'database.adapter = "' . addcslashes($adapter, '"') . '"' . $this->_eol;
-        $content .= $this->_eol;
-        $content .= '; The assigned name or IP address for the database server.' . $this->_eol;
-        $content .= 'database.params.host = "' . addcslashes($host, '"') . '"' . $this->_eol;
-        $content .= $this->_eol;
-        $content .= '; Username and password with the appropriate rights for Phprojekt to access to' . $this->_eol;
-        $content .= '; the database.' . $this->_eol;
-        $content .= 'database.params.username = "' . addcslashes($username, '"') . '"' . $this->_eol;
-        $content .= 'database.params.password = "' . addcslashes($password, '"') . '"' . $this->_eol;
-        $content .= $this->_eol;
-        $content .= '; Name of the database, inside the server' . $this->_eol;
-        $content .= 'database.params.dbname = "' . addcslashes($dbname, '"') . '"' . $this->_eol;
-        $content .= 'database.params.port = ' . (int) $port . $this->_eol;
-        $content .= $this->_eol;
-        $content .= 'database.params.charset = "utf8"' . $this->_eol;
-
-        return $content;
-    }
-
-    /**
      * Return the logs text.
      *
      * @return string Output for save in the file.

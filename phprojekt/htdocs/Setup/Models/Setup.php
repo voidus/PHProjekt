@@ -707,9 +707,14 @@ class Setup_Models_Setup
 
     public function writeConfigFile()
     {
-        $databaseNamespace = new Zend_Session_Namespace('databaseData');
-        $config            = new Setup_Models_Config();
-        $content           = $config->getDefaultProduction();
+        $this->writeLegacyConfig();
+        $this->writeLocalIni();
+    }
+
+    public function writeLegacyConfig()
+    {
+        $config  = new Setup_Models_Config();
+        $content = $config->getDefaultProduction();
 
         $baseDir    = $this->getBaseDir();
         $configFile = $baseDir . "configuration.php";
@@ -718,7 +723,9 @@ class Setup_Models_Setup
 
     public function writeDbIni()
     {
-        $content = $config->getDbIniContent(
+        $databaseNamespace = new Zend_Session_Namespace('databaseData');
+        $config            = new Setup_Models_Config();
+        $content           = $config->getLocalIniContent(
             $databaseNamespace->data['dbUser'],
             $databaseNamespace->data['dbPass'],
             $databaseNamespace->data['dbName'],
