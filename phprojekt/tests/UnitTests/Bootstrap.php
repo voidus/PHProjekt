@@ -19,7 +19,7 @@ $config = new Zend_Config_Ini(
     APPLICATION_ENV,
     array('allowModifications' => true)
 );
-$config->merge(new Zend_Config_Ini(realpath(dirname(__FILE__) . '/db.ini'), APPLICATION_ENV));
+$config->merge(new Zend_Config_Ini(realpath(dirname(__FILE__) . '/local.ini'), APPLICATION_ENV));
 
 $application = new Zend_Application(APPLICATION_ENV, $config);
 $application->bootstrap();

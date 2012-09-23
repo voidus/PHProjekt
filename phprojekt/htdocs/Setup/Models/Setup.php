@@ -721,7 +721,7 @@ class Setup_Models_Setup
         file_put_contents($configFile, $content);
     }
 
-    public function writeDbIni()
+    public function writeLocalIni()
     {
         $databaseNamespace = new Zend_Session_Namespace('databaseData');
         $config            = new Setup_Models_Config();
@@ -734,7 +734,7 @@ class Setup_Models_Setup
             $databaseNamespace->data['dbPort']
         );
 
-        $filename = $this->getBaseDir() . 'application/configs/db.ini';
+        $filename = $this->getBaseDir() . 'application/configs/local.ini';
         file_put_contents($filename, $content);
     }
 

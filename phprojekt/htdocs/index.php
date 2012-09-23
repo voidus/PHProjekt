@@ -50,7 +50,7 @@ if (!file_exists(PHPR_CONFIG_FILE)) {
         APPLICATION_ENV,
         array('allowModifications' => true)
     );
-    $config->merge(new Zend_Config_Ini(APPLICATION_PATH . '/configs/db.ini'));
+    $config->merge(new Zend_Config_Ini(APPLICATION_PATH . '/configs/local.ini'));
 
     $application = new Zend_Application(APPLICATION_ENV, $config);
     $application->bootstrap()->run();

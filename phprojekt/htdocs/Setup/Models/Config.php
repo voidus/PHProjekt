@@ -87,7 +87,7 @@ class Setup_Models_Config
         $this->_setPrivateDir();
     }
 
-    public function getDbIniContent($username, $password, $dbname, $adapter, $host, $port)
+    public function getLocalIniContent($username, $password, $dbname, $adapter, $host, $port)
     {
         return <<<HERE
 resources.db.adapter = $adapter
