@@ -116,6 +116,17 @@ class Setup_Models_Config
         return $content;
     }
 
+    public function getDefaultDevelopment()
+    {
+        return <<<HERE
+
+[development : production]
+log.printStackTraces = true
+compressedDojo = false
+fribtfront.showInternalJsErrors = true
+HERE;
+    }
+
     /**
      * Set the operating system.
      *
@@ -255,30 +266,28 @@ class Setup_Models_Config
     private function _getDatabase($username = '', $password = '', $dbname = '', $adapter = 'Pdo_Mysql',
         $host = 'localhost', $port = 3306)
     {
-        $content  = $this->_eol;
-        $content .= ';;;;;;;;;;;;' . $this->_eol;
-        $content .= '; DATABASE ;' . $this->_eol;
-        $content .= ';;;;;;;;;;;;' . $this->_eol;
-        $content .= $this->_eol;
+        $adapter = addcslashes($adapter, '"');
+        $host = addcslashes($host, '"');
+        $username = addcslashes($username, '"');
+        $password = addcslashes($password, '"');
+        $dbname = addcslashes($dbname, '"');
+        $port = (int) $port;
 
-        $content .= '; For this Developer Release, it just has been tested with pdo_mysql.' . $this->_eol;
-        $content .= 'database.adapter = "' . addcslashes($adapter, '"') . '"' . $this->_eol;
-        $content .= $this->_eol;
-        $content .= '; The assigned name or IP address for the database server.' . $this->_eol;
-        $content .= 'database.params.host = "' . addcslashes($host, '"') . '"' . $this->_eol;
-        $content .= $this->_eol;
-        $content .= '; Username and password with the appropriate rights for Phprojekt to access to' . $this->_eol;
-        $content .= '; the database.' . $this->_eol;
-        $content .= 'database.params.username = "' . addcslashes($username, '"') . '"' . $this->_eol;
-        $content .= 'database.params.password = "' . addcslashes($password, '"') . '"' . $this->_eol;
-        $content .= $this->_eol;
-        $content .= '; Name of the database, inside the server' . $this->_eol;
-        $content .= 'database.params.dbname = "' . addcslashes($dbname, '"') . '"' . $this->_eol;
-        $content .= 'database.params.port = ' . (int) $port . $this->_eol;
-        $content .= $this->_eol;
-        $content .= 'database.params.charset = "utf8"' . $this->_eol;
+        return <<<HERE
+;;;;;;;;;;;;
+; DATABASE ;
+;;;;;;;;;;;;
 
-        return $content;
+; pdo_mysql is the only supported value here.
+resources.db.adapter = "$adapter"
+resources.db.params.host = "$host"
+resources.db.params.username = "$username"
+resources.db.params.password = "$password"
+resources.db.params.dbname = "$dbname"
+resources.db.params.port = $port
+resources.db.params.charset = "utf8"
+
+HERE;
     }
 
     /**

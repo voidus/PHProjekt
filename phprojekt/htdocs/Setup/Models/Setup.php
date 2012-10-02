@@ -717,6 +717,7 @@ class Setup_Models_Setup
             $databaseNamespace->data['dbHost'],
             $databaseNamespace->data['dbPort']
         );
+        $content .= "\n" . $config->getDefaultDevelopment();
 
         $baseDir    = $this->getBaseDir();
         $configFile = $baseDir . "configuration.php";
