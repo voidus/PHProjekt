@@ -18,36 +18,19 @@
  */
 class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 {
-    protected function _initPhprojektConfig()
-    {
-        $this->bootstrap('autoloader');
-        $config = new Zend_Config_Ini(PHPR_CONFIG_FILE, APPLICATION_ENV, true);
-
-        if (empty($config->webpath)) {
-            $response        = new Zend_Controller_Request_Http();
-            $config->webpath = $response->getScheme() . '://' . $response->getHttpHost()
-                . $response->getBasePath() . '/';
-        }
-
-        return $config;
-    }
-
     protected function _initPrivateDirPaths()
     {
-        $this->bootstrap('phprojektConfig');
-
-        $config = $this->getResource('phprojektConfig');
-        defined('PHPR_TEMP_PATH') || define('PHPR_TEMP_PATH', realpath($config->tmpPath));
-        defined('PHPR_UPLOAD_PATH') || define('PHPR_UPLOAD_PATH', realpath($config->uploadPath));
-        defined('PHPR_WEBDAV_PATH') || define('PHPR_WEBDAV_PATH', realpath($config->webdavPath));
-        defined('PHPR_USER_CORE_PATH') || define('PHPR_USER_CORE_PATH', realpath($config->applicationPath));
+        error_log(var_export($this->getOption('tmpPath'), true));
+        defined('PHPR_TEMP_PATH') || define('PHPR_TEMP_PATH', realpath($this->getOption('tmpPath')));
+        defined('PHPR_UPLOAD_PATH') || define('PHPR_UPLOAD_PATH', realpath($this->getOption('uploadPath')));
+        defined('PHPR_WEBDAV_PATH') || define('PHPR_WEBDAV_PATH', realpath($this->getOption('webdavPath')));
+        defined('PHPR_USER_CORE_PATH') || define('PHPR_USER_CORE_PATH', realpath($this->getOption('applicationPath')));
         set_include_path(PHPR_USER_CORE_PATH . PATH_SEPARATOR . get_include_path());
     }
 
     protected function _initLog()
     {
-        $this->bootstrap('phprojektConfig');
-        return new Phprojekt_Log($this->getResource('phprojektConfig'));
+        return new Phprojekt_Log($this->getOption('log'));
     }
 
     protected function _initDispatcherClass()
@@ -254,7 +237,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
 
     protected function _initUserIncludePath()
     {
-        $this->bootstrap('phprojektConfig');
+        $this->bootstrap('privateDirPaths');
         set_include_path(PHPR_USER_CORE_PATH . PATH_SEPARATOR . get_include_path());
     }
 

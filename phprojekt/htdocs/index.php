@@ -52,6 +52,7 @@ if (!file_exists(PHPR_CONFIG_FILE)) {
         array('allowModifications' => true)
     );
     $config->merge(new Zend_Config_Ini(PHPR_ROOT_PATH . '/configuration.php', APPLICATION_ENV));
+    $config->setReadOnly();
 
     $application = new Zend_Application(APPLICATION_ENV, $config);
     $application->bootstrap()->run();

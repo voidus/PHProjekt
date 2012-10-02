@@ -188,11 +188,17 @@ class Phprojekt
     /**
      * Return the Config class.
      *
-     * @return Zend_Config_Ini An instance of Zend_Config_Ini.
+     * @param string $key If specified, the corresponding config option will be retrieved.
+     *
+     * @return Array
      */
-    public function getConfig()
+    public function getConfig($key = null)
     {
-        return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
+        if ($key === null) {
+            return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOptions();
+        } else {
+            return Zend_Controller_Front::getInstance()->getParam('bootstrap')->getOption($key);
+        }
     }
 
     /**
@@ -231,7 +237,7 @@ class Phprojekt
     public function getTranslate($locale = null)
     {
         if (null === $locale) {
-            $locale = Phprojekt_Auth::getRealUser()->getSetting("language", $this->getConfig()->language);
+            $locale = Phprojekt_Auth::getRealUser()->getSetting("language", $this->getConfig()['language']);
         }
 
         if (!($translate = $this->getCache()->load('Phprojekt_getTranslate_' . $locale))) {

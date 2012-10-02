@@ -54,18 +54,18 @@ class Phprojekt_Log extends Zend_Log
      * will create a Zend_Log object
      * with the path to the filename and a filter for these log.
      *
-     * @param Zend_Config $config Object contain the user configuration.
+     * @param Array $config Array contain the log configuration.
      *
      * @return void
      */
-    public function __construct(Zend_Config $config)
+    public function __construct($config)
     {
         parent::__construct();
 
         $this->_loggers = array();
 
-        if (isset($config->log)) {
-            foreach ($config->log as $key => $val) {
+        if (isset($config)) {
+            foreach ($config as $key => $val) {
                 $constant = "self::" . strtoupper($key);
                 if (defined($constant)) {
                     $priority = constant($constant);
