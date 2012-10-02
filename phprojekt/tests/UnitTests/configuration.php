@@ -1,21 +1,11 @@
 ; <?php die(); /* Do not remove this line */ ?>
 
-[testing-mysql : general]
-database.adapter            = "Pdo_Mysql"
-database.params.host        = "127.0.0.1"
-database.params.dbname      = "phprojekt-test-memory"
-database.params.username    = "root"
-database.params.password    = ""
-
-[testing-pgsql: general]
-database.adapter            = "Pdo_Pgsql"
-database.params.host        = "localhost"
-database.params.dbname      = "phprojekt-mvc-testing"
-database.params.username    = "phprojekt"
-database.params.password    = "phprojekt"
-
-
-[general]
+[testing]
+resources.db.adapter            = "Pdo_Mysql"
+resources.db.params.host        = "localhost"
+resources.db.params.dbname      = "phprojekt_test"
+resources.db.params.username    = "phprojekt"
+resources.db.params.password    = ""
 
 tmpPath            = "phprojekt/tests/private_folder/tmp/"
 applicationPath    = "phprojekt/tests/private_folder/application/"

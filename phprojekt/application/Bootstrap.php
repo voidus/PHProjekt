@@ -21,7 +21,7 @@ class Bootstrap extends Zend_Application_Bootstrap_Bootstrap
     protected function _initPhprojektConfig()
     {
         $this->bootstrap('autoloader');
-        $config = new Zend_Config_Ini(PHPR_CONFIG_FILE, 'production', true);
+        $config = new Zend_Config_Ini(PHPR_CONFIG_FILE, APPLICATION_ENV, true);
 
         if (empty($config->webpath)) {
             $response        = new Zend_Controller_Request_Http();

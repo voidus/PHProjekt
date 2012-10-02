@@ -2,13 +2,11 @@ language: php
 php:
     - 5.3
     - 5.4
-env:
-    - P6_TEST_CONFIG=configuration-travis.php
 before_script:
     - pyrus channel-discover pear.symfony.com
     - pyrus install --force phpunit/DbUnit
     - phpenv rehash
-    - mysql -u root -e 'create database `phprojekt-test-memory`'
+    - mysql -u root -e 'create database `phprojekt_test`; grant all on phprojekt.* to phprojekt@localhost;'
     - mysql -u root phprojekt-test-memory < phprojekt/tests/test_database_memory.sql
 script:
     - phpunit -c phpunit-travis.xml
