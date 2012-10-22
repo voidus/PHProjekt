@@ -26,8 +26,8 @@ final class Default_Helpers_Save
      *
      * @param mixed   $model   A model
      * @param array   $params  The mysterious parameters array
-     * @param boolean $newItem At least something need a special handling,
-     *                         so new items get something special.
+     * @param boolean $newItem If true and the model has an ownerId field, the owner will be set to the current user.
+     *
      * @return mixed The modified model
      */
     public static function parameterToModel($model, $params, $newItem = false)
