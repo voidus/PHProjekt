@@ -43,6 +43,7 @@ dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
         });
         phpr.viewManager.getView().gridBox.set('content', this.grid);
         this.addExportButton();
+        this.setTimecardCaldavClientButton();
     },
 
     addExportButton: function() {
@@ -89,5 +90,61 @@ dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
             })
         };
         window.open('index.php/Timecard/Timecard/?' + dojo.objectToQuery(params), '_blank');
+    },
+
+    setTimecardCaldavClientButton: function() {
+        // Summary:
+        //    Set the timecardCaldavClient button
+        // Description:
+        //    Set the timecardCaldavClient button
+        this.garbageCollector.collect('timecardCaldavClient');
+
+        var prefix = phpr.getAbsoluteUrl('index.php/Timecard/caldav/index/'),
+            url = prefix + 'calendars/' + phpr.config.currentUserName + '/default/',
+            iosUrl = prefix + 'principals/' + phpr.config.currentUserName + '/',
+            params = {
+                label: 'Timecard Caldav Client',
+                showLabel: true,
+                baseClass: 'positive',
+                disabled: false
+            },
+            timecardCaldavClientButton = new dijit.form.Button(params);
+
+        phpr.viewManager.getView().buttonRow.domNode.appendChild(timecardCaldavClientButton.domNode);
+
+        this.garbageCollector.addNode(timecardCaldavClientButton, 'timecardCaldavClient');
+        this.garbageCollector.addEvent(
+            dojo.connect(
+                timecardCaldavClientButton,
+                'onClick',
+                dojo.hitch(this, 'showTimecardCaldavClientData', url, iosUrl)
+            ),
+            'timecardCaldavClient'
+        );
+    },
+
+    showTimecardCaldavClientData: function(url, iosUrl) {
+        var content = phpr.fillTemplate(
+            'phpr.Calendar2.template.caldavView.html',
+            {
+                headline: 'Timecard Caldav Client',
+                normalLabel: phpr.nls.get('CalDav url', 'Calendar2'),
+                iosLabel: phpr.nls.get('CalDav url for Apple software', 'Calendar2'),
+                noticeLabel: phpr.nls.get('Notice', 'Calendar2'),
+                notice: phpr.nls.get('Please pay attention to the trailing slash, it is important', 'Calendar2'),
+                normalUrl: url,
+                iosUrl: iosUrl
+            }
+        );
+
+        //draggable = false must be set because otherwise the dialog can not be closed on the ipad
+        //bug: http://bugs.dojotoolkit.org/ticket/13488
+        var dialog = new dijit.Dialog({
+            content: content,
+            draggable: false
+        });
+
+        dialog.show();
+        this.garbageCollector.addNode(dialog, 'timecardCaldavClient');
     }
 });
