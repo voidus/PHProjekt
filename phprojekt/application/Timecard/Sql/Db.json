@@ -76,6 +76,24 @@
             }
         }
     }
+},
+
+"6.2.2":
+{
+    "structure":
+    {
+        "contract":
+        {
+            "create":
+            {
+                "id":               "default",
+                "hoursPerWorkday":  {"type": "int", "notNull": "true"},
+                "start":            {"type": "date", "notNull": "true"},
+                "end":              {"type": "date"},
+                "owner_id":         {"type": "int", "notNull": "true"}
+            }
+        }
+    }
 }
 
 }
