@@ -21,8 +21,11 @@
 dojo.provide("phpr.Timecard.Main");
 
 dojo.require("dijit.ColorPalette");
+dojo.require("phpr.Timecard.ContractsGrid");
 
 dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
+    stackContainer: null,
+
     constructor: function() {
         this.module = "Timecard";
         this.loadFunctions(this.module);
@@ -38,10 +41,18 @@ dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
     },
 
     setWidgets: function() {
+        this.stackContainer = new dijit.layout.StackContainer();
         this.grid = new phpr.Timecard.GridWidget({
             store: new dojo.store.JsonRest({target: 'index.php/Timecard/Timecard/'})
         });
-        phpr.viewManager.getView().gridBox.set('content', this.grid);
+        this.stackContainer.addChild(this.grid);
+
+        this.contractsGridPane = new dijit.layout.ContentPane();
+        this.contractsGrid = phpr.Timecard.ContractsGrid('', this, null, this.contractsGridPane, {});
+        this.stackContainer.addChild(this.contractsGridPane);
+
+        phpr.viewManager.getView().gridBox.set('content', this.stackContainer);
+        this.addContractsButton();
         this.addExportButton();
         this.setTimecardCaldavClientButton();
     },
@@ -73,6 +84,36 @@ dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
                 );
             })
         );
+    },
+
+    addContractsButton: function() {
+        var inContractsView = false;
+
+        var contractsLabel = phpr.nls.get('Manage contracts'),
+            returnLabel = phpr.nls.get('Return to timecard view');
+        var contractsParams = {
+            label:     contractsLabel,
+            showLabel: true,
+            baseClass: "positive",
+            disabled:  false
+        };
+        var contractsButton = new dijit.form.Button(contractsParams);
+
+
+        this.garbageCollector.addNode(contractsButton);
+
+        phpr.viewManager.getView().buttonRow.domNode.appendChild(contractsButton.domNode);
+        contractsButton.connect(contractsButton, "onClick", dojo.hitch(this, function() {
+            if (inContractsView) {
+                inContractsView = false;
+                contractsButton.set("label", contractsLabel);
+                this.stackContainer.selectChild(this.grid);
+            } else {
+                inContractsView = true;
+                contractsButton.set("label", returnLabel);
+                this.stackContainer.selectChild(this.contractsGridPane);
+            }
+        }));
     },
 
     exportData: function(year, month) {
