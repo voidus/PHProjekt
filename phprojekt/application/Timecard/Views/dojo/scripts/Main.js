@@ -21,6 +21,7 @@
 dojo.provide("phpr.Timecard.Main");
 
 dojo.require("dijit.ColorPalette");
+dojo.require("phpr.Timecard.ContractsGridDialog");
 
 dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
     constructor: function() {
@@ -38,10 +39,12 @@ dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
     },
 
     setWidgets: function() {
+        debugger;
         this.grid = new phpr.Timecard.GridWidget({
             store: new dojo.store.JsonRest({target: 'index.php/Timecard/Timecard/'})
         });
         phpr.viewManager.getView().gridBox.set('content', this.grid);
+        this.addContractsButton();
         this.addExportButton();
         this.setTimecardCaldavClientButton();
     },
@@ -73,6 +76,25 @@ dojo.declare("phpr.Timecard.Main", phpr.Default.Main, {
                 );
             })
         );
+    },
+
+    addContractsButton: function() {
+        var contractsParams = {
+            label:     phpr.nls.get("Manage contracts"),
+            showLabel: true,
+            baseClass: "positive",
+            disabled:  false
+        };
+        var contractsButton = new dijit.form.Button(contractsParams);
+
+        this.garbageCollector.addNode(contractsButton);
+
+        phpr.viewManager.getView().buttonRow.domNode.appendChild(contractsButton.domNode);
+        debugger;
+        contractsButton.connect(contractsButton, "onClick", dojo.hitch(this, function() {
+            debugger;
+            var grid = phpr.Timecard.ContractsGridDialog('', this, null, phpr.viewManager.getView().gridBox, {});
+        }));
     },
 
     exportData: function(year, month) {
